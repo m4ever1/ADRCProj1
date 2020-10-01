@@ -35,10 +35,6 @@ string fileIO::readLine()// returns a string containing the line, if EOF/ERROR r
         return(NULL);
     }
 }
-int fileIO::isEOF()
-{
-
-}
 
 
 fileIO::~fileIO()

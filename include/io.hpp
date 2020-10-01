@@ -15,7 +15,6 @@ public:
     fileIO &operator=(const fileIO &) = default;
     ~fileIO();
     string readLine();
-    int isEOF();
 private:
     string fileName;
     ifstream file;
