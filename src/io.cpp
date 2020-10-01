@@ -19,7 +19,7 @@ void fileIO::openFile()
         std::cerr << e.what() << '\n';
     }
 }
-string fileIO::readLine()// returns a string containing the line, if EOF/ERROR returns NULL
+string fileIO::readLine()// returns a string containing the line, if EOF returns "EOF" string
 {
     string line;
     if(this->file.is_open())
@@ -27,7 +27,7 @@ string fileIO::readLine()// returns a string containing the line, if EOF/ERROR r
         if(getline(this->file, line))
             return line;
         else
-            return "";
+            return "EOF";
     }
     else
     {

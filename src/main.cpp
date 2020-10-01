@@ -10,9 +10,9 @@ int main(int argc, char **argv)
     fileIO fileObj = fileIO(argv[1]);
     fileObj.openFile();
     string str;
-    while(!(str = fileObj.readLine()).empty())
+    while((str = fileObj.readLine()) != "EOF")
     {
         std::cout << str << std::endl;
     }
-    
+    return 0;
 }
