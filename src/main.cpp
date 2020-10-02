@@ -1,4 +1,5 @@
 #include "io.hpp"
+#include "Graph.hpp"
 
 int main(int argc, char **argv) 
 {
@@ -9,10 +10,15 @@ int main(int argc, char **argv)
     }
     fileIO fileObj = fileIO(argv[1]);
     fileObj.openFile();
+    Graph graphObj;
     string str;
+    int src, dest, type;
     while((str = fileObj.readLine()) != "EOF")
     {
-        std::cout << str << std::endl;
+        sscanf(str.c_str(), "%d %d %d\n", &src, &dest, &type);
+        graphObj.addConnection(src, dest, type);
     }
+    graphObj.printGraph();
+
     return 0;
 }

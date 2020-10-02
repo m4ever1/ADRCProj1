@@ -1,9 +1,6 @@
 
 #include "io.hpp"
 
-
-
-
 fileIO::fileIO(string fileName_)
 {
     this->fileName = fileName_;
