@@ -9,10 +9,6 @@ class fileIO
 public:
     fileIO(string fileName_);
     void openFile();
-    fileIO(fileIO &&) = default;
-    fileIO(const fileIO &) = default;
-    fileIO &operator=(fileIO &&) = default;
-    fileIO &operator=(const fileIO &) = default;
     ~fileIO();
     string readLine();
 private:
