@@ -18,6 +18,8 @@ run: clean all
 	./$(BIN)/$(EXECUTABLE) $(ARGS)
 
 $(BIN)/$(EXECUTABLE): $(SRC)/*.cpp
+	[ -d $(LIB) ] || mkdir -p $(LIB)
+	[ -d $(BIN) ] || mkdir -p $(BIN)
 	$(CXX) $(CXX_FLAGS) -I$(INCLUDE) -L$(LIB) $^ -o $@ $(LIBRARIES)
 
 clean:
