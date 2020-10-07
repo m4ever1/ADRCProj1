@@ -20,6 +20,6 @@ int main(int argc, char **argv)
     }
     graphObj.printGraph();
     std::cout << "Number of vertices = " << graphObj.getNumVertices() << std::endl;
-
+    graphObj.DFS(4323);
     return 0;
 }

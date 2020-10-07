@@ -26,3 +26,37 @@ int Graph::getNumVertices()
 {
     return this->numVertices;
 }
+    //DFS inspired by:
+    //https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/
+
+void Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited)
+{
+    // Mark the current node as visited and 
+    // print it 
+    (*visited)[vertID] = true; 
+    cout << vertID << " "; 
+  
+    // Recur for all the vertices adjacent 
+    // to this vertex 
+    for(auto listEntry : adjMap[vertID])
+    {
+        int currV = listEntry.getDest();
+        if(!(*visited)[currV])
+        {
+            DFSUtil(currV, visited);
+        }
+    }
+}
+
+void Graph::DFS(int startingV)
+{
+    // Mark all the vertices as not visited 
+    unordered_map<int, bool>* visited = new unordered_map<int, bool>;
+    for (auto mapEntry : adjMap)
+    {
+        (*visited)[mapEntry.first] = false; 
+    }
+    // Call the recursive helper function 
+    // to print DFS traversal 
+    DFSUtil(startingV, visited);  
+}
