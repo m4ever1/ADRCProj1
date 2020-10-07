@@ -1,9 +1,10 @@
 #pragma once
 
-class Connection {
+class Connection 
+{
     int dest;
     int type;
-    public:
+public:
     Connection(int, int);
     void setType(int);
     int getType();

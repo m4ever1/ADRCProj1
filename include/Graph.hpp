@@ -12,8 +12,10 @@ using namespace std;
 
 class Graph {
     unordered_map<int ,list<Connection>> adjMap; //unordered hasmap of lists of vertices
+    int numVertices = 0;
 public:
     void addVertice(int);
     void addConnection(int, int, int);
     void printGraph();
+    int getNumVertices();
 };

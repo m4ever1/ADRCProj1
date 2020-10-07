@@ -6,6 +6,7 @@
 void Graph::addConnection(int src, int dest, int type)
 {
     this->adjMap[src].push_back(Connection(dest, type));
+    this->numVertices++;
 }
 
 void Graph::printGraph()
@@ -19,4 +20,9 @@ void Graph::printGraph()
             std::cout << listEntry.getDest() << " " << listEntry.getType() << std::endl;
         }
     }
+}
+
+int Graph::getNumVertices()
+{
+    return this->numVertices;
 }
