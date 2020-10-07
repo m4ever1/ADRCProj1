@@ -20,4 +20,6 @@ public:
     void printGraph();
     int getNumVertices();
     void DFS(int);
+    void CheckBiConnected();
+    unordered_map<int ,list<Connection>> CloneAdjacencyList();
 };

@@ -2,7 +2,6 @@
 #include "Connection.hpp"
 
 
-
 void Graph::addConnection(int src, int dest, int type)
 {
     this->adjMap[src].push_back(Connection(dest, type));
@@ -26,8 +25,8 @@ int Graph::getNumVertices()
 {
     return this->numVertices;
 }
-    //DFS inspired by:
-    //https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/
+    // DFS inspired by:
+    // https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/
 
 void Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited)
 {
@@ -54,9 +53,35 @@ void Graph::DFS(int startingV)
     unordered_map<int, bool>* visited = new unordered_map<int, bool>;
     for (auto mapEntry : adjMap)
     {
-        (*visited)[mapEntry.first] = false; 
+        (*visited)[mapEntry.first] = false;
     }
     // Call the recursive helper function 
     // to print DFS traversal 
-    DFSUtil(startingV, visited);  
+    DFSUtil(startingV, visited);
 }
+
+void Graph::CheckBiConnected()
+{
+    for (auto mapEntry : adjMap)
+    {
+        for(auto listEntry : mapEntry.second)
+        {
+            // Remove connection
+            // Check if connect
+            // Restore Connection
+        }
+    }
+}
+
+// unordered_map<int ,list<Connection>> Graph::CloneAdjacencyList()
+// {
+//     unordered_map<int ,list<Connection>> replicaMap;
+
+//     for(auto mapEntry : adjMap)
+//     {
+//         for(auto listEntry : mapEntry.second)
+//         {
+//             replicaMap[mapEntry.first].push_back(Connection(listEntry.getDest(), listEntry.getType());
+//         }
+//     }
+// }

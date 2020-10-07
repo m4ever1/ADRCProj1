@@ -10,16 +10,26 @@ int main(int argc, char **argv)
     }
     fileIO fileObj(argv[1]);
     fileObj.openFile();
-    Graph graphObj;
+
+    Graph graphObj, graphReplicaObj;
     string str;
     int src, dest, type;
+
     while((str = fileObj.readLine()) != "EOF")
     {
         sscanf(str.c_str(), "%d %d %d\n", &src, &dest, &type);
         graphObj.addConnection(src, dest, type);
     }
+
     graphObj.printGraph();
+
     std::cout << "Number of vertices = " << graphObj.getNumVertices() << std::endl;
+
+    // Check if graph is connect
     graphObj.DFS(4323);
+    // Check if graph is biconnected
+    graphObj.CheckBiConnected();
+    
+
     return 0;
 }
