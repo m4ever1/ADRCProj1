@@ -58,6 +58,7 @@ void Graph::DFS(int startingV)
     // Call the recursive helper function 
     // to print DFS traversal 
     DFSUtil(startingV, visited);
+    free(visited);
 }
 
 void Graph::CheckBiConnected()
