@@ -57,7 +57,7 @@ bool Graph::isConnectionCut(int currV, int nextV, pair<int, int> cutC)
     return((currV == cutC.first && nextV == cutC.second) || (currV == cutC.second && nextV == cutC.first));
 }
 
-bool Graph::DFS(int startingV, pair<int, int> cutC)
+bool Graph::DFS(int startingV, pair<int, int>* cutC = nullptr)
 {
     bool connected = true;
     // Mark all the vertices as not visited 
@@ -68,7 +68,7 @@ bool Graph::DFS(int startingV, pair<int, int> cutC)
     }
     // Call the recursive helper function 
     // to print DFS traversal 
-    DFSUtil(startingV, visited, cutC);
+    DFSUtil(startingV, visited, *cutC);
     for(auto entry : *visited)// inefficient, better to have a counter inside the DFS stack
     {
         if(entry.second == false)
@@ -93,9 +93,13 @@ bool Graph::CheckBiConnected()
             pair<int, int> cutC = make_pair(src, dest);
             checkedConnections.push_back(make_pair(src, dest));
             // Check if connected
-            return(DFS(src, cutC));
+            if(!DFS(src, &cutC))
+            {
+                return(false);
+            }
         }
     }
+    return(true);
 }
 
 // unordered_map<int ,list<Connection>> Graph::CloneAdjacencyList()

@@ -21,7 +21,7 @@ public:
     void addConnection(int, int, int);
     void printGraph();
     int getNumVertices();
-    bool DFS(int, pair<int, int>);
+    bool DFS(int, pair<int, int>*);
     bool CheckBiConnected();
     unordered_map<int ,list<Connection>> CloneAdjacencyList();
     void removeConnection(int, int, int);
