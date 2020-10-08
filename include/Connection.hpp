@@ -10,5 +10,7 @@ public:
     int getType();
     void setDest(int);
     int getDest();
+    int getReciprocalType();
+    friend bool operator== (const Connection&, const Connection&);
     ~Connection();
 };

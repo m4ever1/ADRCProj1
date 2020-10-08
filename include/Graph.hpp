@@ -2,6 +2,7 @@
 #include <iostream>
 #include <list>
 #include <unordered_map>
+#include <utility> 
 #include "Connection.hpp"
 
 using namespace std;
@@ -13,13 +14,15 @@ using namespace std;
 class Graph {
     unordered_map<int ,list<Connection>> adjMap; //unordered hasmap of lists of vertices
     int numVertices = 0;
-    void DFSUtil(int , unordered_map<int, bool>*);
+    void DFSUtil(int , unordered_map<int, bool>*, pair<int, int>);
+    bool isConnectionCut(int, int, pair<int, int>);
 public:
     void addVertice(int);
     void addConnection(int, int, int);
     void printGraph();
     int getNumVertices();
-    void DFS(int);
-    void CheckBiConnected();
+    bool DFS(int, pair<int, int>);
+    bool CheckBiConnected();
     unordered_map<int ,list<Connection>> CloneAdjacencyList();
+    void removeConnection(int, int, int);
 };

@@ -26,9 +26,17 @@ int main(int argc, char **argv)
     std::cout << "Number of vertices = " << graphObj.getNumVertices() << std::endl;
 
     // Check if graph is connect
-    graphObj.DFS(4323);
+    if(graphObj.CheckBiConnected())
+    {
+        std::cout << "YES" << std::endl;
+    }
+    else
+    {
+        std::cout << "no" << std::endl;
+    }
+    
     // Check if graph is biconnected
-    graphObj.CheckBiConnected();
+
     
 
     return 0;

@@ -19,6 +19,26 @@ void Connection::setDest(int dest) {
 int Connection::getDest() {
     return dest;
 }
+
+int Connection::getReciprocalType() 
+{
+    switch (this->type)
+    {
+    case 1:
+        return(3);
+    case 2:
+        return(2);
+    default:
+        return(1);
+    }
+}
+
+bool operator== (const Connection& lhs, const Connection& rhs) 
+{
+    return(lhs.dest == rhs.dest && lhs.type == rhs.type);
+}
+
+
 Connection::~Connection() {
 
 }
