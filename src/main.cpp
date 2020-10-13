@@ -1,5 +1,6 @@
 #include "Io.hpp"
 #include "Graph.hpp"
+#include "Generator.hpp"
 
 int main(int argc, char **argv) 
 {
@@ -11,7 +12,8 @@ int main(int argc, char **argv)
     fileIO fileObj(argv[1]);
     fileObj.openFile();
 
-    Graph graphObj, graphReplicaObj;
+    Graph graphObj, genGraph;
+
     string str;
     int src, dest, type;
 
@@ -20,8 +22,9 @@ int main(int argc, char **argv)
         sscanf(str.c_str(), "%d %d %d\n", &src, &dest, &type);
         graphObj.addConnection(src, dest, type);
     }
-
     graphObj.printGraph();
+    Generator gen;
+    genGraph = gen.generate(10);
 
     std::cout << "Number of vertices = " << graphObj.getNumVertices() << std::endl;
 
@@ -35,6 +38,9 @@ int main(int argc, char **argv)
         std::cout << "no" << std::endl;
     }
     
+    std::cout << "\n\n" << std::endl;
+
+    genGraph.printGraph();
     // Check if graph is biconnected
 
     

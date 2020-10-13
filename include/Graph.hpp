@@ -25,4 +25,5 @@ public:
     bool CheckBiConnected();
     unordered_map<int ,list<Connection>> CloneAdjacencyList();
     void removeConnection(int, int, int);
+    void reset();
 };

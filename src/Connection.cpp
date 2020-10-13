@@ -20,9 +20,9 @@ int Connection::getDest() {
     return dest;
 }
 
-int Connection::getReciprocalType() 
+int Connection::getReciprocalType(int type) 
 {
-    switch (this->type)
+    switch (type)
     {
     case 1:
         return(3);

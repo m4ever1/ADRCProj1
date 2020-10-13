@@ -13,6 +13,13 @@ void Graph::removeConnection(int src, int dest, int type)
     adjMap[src].remove(Connection(dest, type));
 }
 
+void Graph::reset() 
+{
+    numVertices = 0;
+    // unordered_map<int ,list<Connection>>::iterator itr;
+    adjMap.clear();
+}
+
 void Graph::printGraph()
 {
     // unordered_map<int ,list<Connection>>::iterator itr;
