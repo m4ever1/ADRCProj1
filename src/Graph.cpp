@@ -141,7 +141,6 @@ bool Graph::CheckAcyclic()
     std::cout << "************ CHECK ACYCLIC ************" << std::endl;
 
     std::queue<int> queue;
-    std::queue<int> path;
 
     // Mark all the vertices as not visited 
     unordered_map<int, bool>* visited = new unordered_map<int, bool>;
@@ -158,7 +157,6 @@ bool Graph::CheckAcyclic()
             // Mark the node as visited and push it to the queue
             (*visited)[mapEntry.first] = true;
             queue.push(mapEntry.first);
-            path.push(mapEntry.first);
 
             // While the FIFO queue is not empty
             while(queue.size() != 0)
@@ -172,12 +170,13 @@ bool Graph::CheckAcyclic()
                     int destination = listEntry.getDest();
                     int destinationType = listEntry.getType();
 
-                    std::cout << "src: " << frontOfQueue << " dest: " << destination << " type: " << destinationType << endl;
+                    // Only consider provider customer connections
+                    if (destinationType != 1)
+                        continue;
 
                     if((*visited)[destination] == true)
                     { 
-                        // std::cout << "src: " << frontOfQueue << " dest: " << destination << " type: " << destinationType << endl;
-
+                        std::cout << "src: " << frontOfQueue << " dest: " << destination << " type: " << destinationType << endl;
                         return false;
                     }
                     else
