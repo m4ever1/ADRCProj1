@@ -1,21 +1,36 @@
 #include "Graph.hpp"
-#include "Connection.hpp"
-
 
 void Graph::addConnection(int src, int dest, int type)
 {
-    this->adjMap[src].push_back(Connection(dest, type));
-    this->numVertices++;
+    if(adjMap.find(src) == adjMap.end()) // key 'src' is not present in the dict
+        numVertices++;
+    numConnections++;
+    adjMap[src].push_back(Connection(dest, type));
+
 }
 
 void Graph::removeConnection(int src, int dest, int type)
 {
     adjMap[src].remove(Connection(dest, type));
+    if(adjMap.find(src) == adjMap.end()) // key 'src' is not present in the dict
+        numVertices--;
 }
+
+bool Graph::doesConnExist(int src, int dest)
+{
+    for(auto listEntry : adjMap[src])
+    {
+        if(listEntry.getDest() == dest)
+            return(true);
+    }
+    return(false);
+}
+
 
 void Graph::reset() 
 {
     numVertices = 0;
+    numConnections = 0;
     // unordered_map<int ,list<Connection>>::iterator itr;
     adjMap.clear();
 }
@@ -23,13 +38,28 @@ void Graph::reset()
 void Graph::printGraph()
 {
     // unordered_map<int ,list<Connection>>::iterator itr;
-    for(auto mapEntry : adjMap)
+    std::list<Connection>::iterator it;
+    int completed = 0;
+    int i = 0;
+    bool done = false;
+    while(!done)
     {
-        std::cout << mapEntry.first << " ";
-        for(auto listEntry : mapEntry.second)
+        for(auto mapEntry : adjMap)
         {
-            std::cout << listEntry.getDest() << " " << listEntry.getType() << std::endl;
+            it = mapEntry.second.begin();
+            std::advance(it, i);
+            if(it == mapEntry.second.end())
+            {
+                completed++;
+                continue;
+            }
+            std::cout << mapEntry.first << " " << (*it).getDest() << " " << (*it).getType() << std::endl;  
         }
+        if(completed >= numVertices)
+        {
+            done = true;
+        }
+        i++;
     }
 }
 

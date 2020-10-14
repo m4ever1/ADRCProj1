@@ -24,7 +24,7 @@ int main(int argc, char **argv)
     }
     graphObj.printGraph();
     Generator gen;
-    genGraph = gen.generate(10);
+    genGraph = gen.generateGraph(4);
 
     std::cout << "Number of vertices = " << graphObj.getNumVertices() << std::endl;
 
