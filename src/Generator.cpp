@@ -2,11 +2,16 @@
 
 Graph Generator::generateGraph(int nrNodes)
 {
+    for(int i = 1; i < nrNodes + 1; i++)
+    {
+        genGraph.addVertice(i);
+    }
+
     srand (time(NULL));
     for(int i = 1; i < nrNodes + 1; i++)
     {
         int numConn = rand() % nrNodes;
-            std::cout << "\n" << numConn <<"\n" << std::endl;
+        // std::cout << "\n" << numConn <<"\n" << std::endl;
         for(int j = 0; j < numConn; j++)
         {
             int typeRnd = rand() % 3 + 1;

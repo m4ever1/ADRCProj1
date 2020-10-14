@@ -15,7 +15,7 @@ class Graph {
     unordered_map<int ,list<Connection>> adjMap; //unordered hasmap of lists of vertices
     int numVertices = 0;
     int numConnections = 0;
-    void DFSUtil(int , unordered_map<int, bool>*, pair<int, int>);
+    void DFSUtil(int , unordered_map<int, bool>*, pair<int, int>*);
     bool isConnectionCut(int, int, pair<int, int>);
 public:
     bool doesConnExist(int, int);
@@ -24,6 +24,7 @@ public:
     void printGraph();
     int getNumVertices();
     bool DFS(int, pair<int, int>*);
+    bool checkConnected();
     bool CheckBiConnected();
     unordered_map<int ,list<Connection>> CloneAdjacencyList();
     void removeConnection(int, int, int);

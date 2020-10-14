@@ -23,13 +23,13 @@ int main(int argc, char **argv)
         graphObj.addConnection(src, dest, type);
     }
     graphObj.printGraph();
-    Generator gen;
-    genGraph = gen.generateGraph(4);
-
     std::cout << "Number of vertices = " << graphObj.getNumVertices() << std::endl;
 
+    Generator gen;
+    genGraph = gen.generateGraph(5);
     // Check if graph is connect
-    if(graphObj.CheckBiConnected())
+    std::cout << "Is graph CONNECTED?" << std::endl;
+    if(graphObj.checkConnected())
     {
         std::cout << "YES" << std::endl;
     }
@@ -38,9 +38,19 @@ int main(int argc, char **argv)
         std::cout << "no" << std::endl;
     }
     
-    std::cout << "\n\n" << std::endl;
+    std::cout << std::endl;
 
     genGraph.printGraph();
+    std::cout << "Number of vertices = " << genGraph.getNumVertices() << std::endl;
+    std::cout << "Is graph CONNECTED?" << std::endl;
+    if(genGraph.checkConnected())
+    {
+        std::cout << "YES" << std::endl;
+    }
+    else
+    {
+        std::cout << "no" << std::endl;
+    }
     // Check if graph is biconnected
 
     

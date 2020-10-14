@@ -1,9 +1,17 @@
 #include "Graph.hpp"
 
+void Graph::addVertice(int src)
+{
+    adjMap[src] = {};
+    numVertices++;
+}
+
 void Graph::addConnection(int src, int dest, int type)
 {
     if(adjMap.find(src) == adjMap.end()) // key 'src' is not present in the dict
+    {    
         numVertices++;
+    }
     numConnections++;
     adjMap[src].push_back(Connection(dest, type));
 
@@ -13,7 +21,7 @@ void Graph::removeConnection(int src, int dest, int type)
 {
     adjMap[src].remove(Connection(dest, type));
     if(adjMap.find(src) == adjMap.end()) // key 'src' is not present in the dict
-        numVertices--;
+        numConnections--;
 }
 
 bool Graph::doesConnExist(int src, int dest)
@@ -70,19 +78,19 @@ int Graph::getNumVertices()
     // DFS inspired by:
     // https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/
 
-void Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int> cutC)
+void Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int>* cutC)
 {
     // Mark the current node as visited and 
     // print it 
     (*visited)[vertID] = true; 
-    cout << vertID << " "; 
+    // cout << vertID << " "; 
   
     // Recur for all the vertices adjacent 
     // to this vertex 
     for(auto listEntry : adjMap[vertID])
     {
         int nextV = listEntry.getDest();
-        if((!(*visited)[nextV]) && !isConnectionCut(vertID, nextV, cutC))//need to build a comparator function for the pairs,
+        if((!(*visited)[nextV]) && (cutC == nullptr || !isConnectionCut(vertID, nextV, *cutC)))//need to build a comparator function for the pairs,
         {
             DFSUtil(nextV, visited, cutC);
         }
@@ -105,7 +113,7 @@ bool Graph::DFS(int startingV, pair<int, int>* cutC = nullptr)
     }
     // Call the recursive helper function 
     // to print DFS traversal 
-    DFSUtil(startingV, visited, *cutC);
+    DFSUtil(startingV, visited, cutC);
     for(auto entry : *visited)// inefficient, better to have a counter inside the DFS stack
     {
         if(entry.second == false)
@@ -115,6 +123,15 @@ bool Graph::DFS(int startingV, pair<int, int>* cutC = nullptr)
     }
     free(visited);
     return connected;
+}
+bool Graph::checkConnected()
+{
+    int src = adjMap.begin()->first;
+    if(!DFS(src))
+    {
+        return(false);
+    }
+    return(true);
 }
 
 bool Graph::CheckBiConnected()
@@ -138,16 +155,3 @@ bool Graph::CheckBiConnected()
     }
     return(true);
 }
-
-// unordered_map<int ,list<Connection>> Graph::CloneAdjacencyList()
-// {
-//     unordered_map<int ,list<Connection>> replicaMap;
-
-//     for(auto mapEntry : adjMap)
-//     {
-//         for(auto listEntry : mapEntry.second)
-//         {
-//             replicaMap[mapEntry.first].push_back(Connection(listEntry.getDest(), listEntry.getType());
-//         }
-//     }
-// }
