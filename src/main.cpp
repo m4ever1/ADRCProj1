@@ -26,18 +26,28 @@ int main(int argc, char **argv)
     std::cout << "Number of vertices = " << graphObj.getNumVertices() << std::endl;
 
     // Check if graph is connect
-    if(graphObj.CheckBiConnected())
-    {
-        std::cout << "YES" << std::endl;
-    }
+    if(graphObj.CheckConnected())
+        std::cout << "CONNECTED" << std::endl;
     else
-    {
-        std::cout << "no" << std::endl;
-    }
-    
+        std::cout << "NOT CONNECTED" << std::endl;
+
     // Check if graph is biconnected
+    if(graphObj.CheckBiConnected())
+        std::cout << "BICONNECTED" << std::endl;
+    else
+    {   
+        std::cout << "NOT BICONNECTED" << std::endl;
+    }
 
+    // Check if graph is biconnected
+    if(graphObj.CheckAcyclic())
+        std::cout << "ACYCLIC" << std::endl;
+    else
+    {   
+        std::cout << "CYCLIC" << std::endl;
+    }
+        
     
-
+    
     return 0;
 }

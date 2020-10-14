@@ -8,7 +8,7 @@ LIB		:= lib
 
 LIBRARIES	:=
 EXECUTABLE	:= main
-ARGS		:= ./input/enunc.txt
+ARGS		:= ./input/small_tree.txt
 
 
 all: $(BIN)/$(EXECUTABLE) $(ARGS)
