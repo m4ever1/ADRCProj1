@@ -142,6 +142,9 @@ bool Graph::CheckAcyclic()
 
     std::queue<int> queue;
 
+    // Create an array of roles: Provider (1) and Customer (3)
+    int roles[] = {1, 3};
+
     // Mark all the vertices as not visited 
     unordered_map<int, bool>* visited = new unordered_map<int, bool>;
     for (auto mapEntry : adjMap)
@@ -164,19 +167,13 @@ bool Graph::CheckAcyclic()
                 int frontOfQueue = queue.front();
                 queue.pop();
 
-                printf("-\n");
                 for (auto listEntry: adjMap[frontOfQueue])
                 {
                     int destination = listEntry.getDest();
                     int destinationType = listEntry.getType();
 
-                    // Only consider provider customer connections
-                    if (destinationType != 1)
-                        continue;
-
                     if((*visited)[destination] == true)
-                    { 
-                        std::cout << "src: " << frontOfQueue << " dest: " << destination << " type: " << destinationType << endl;
+                    {
                         return false;
                     }
                     else
