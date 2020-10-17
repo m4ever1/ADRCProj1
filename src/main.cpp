@@ -27,6 +27,7 @@ int main(int argc, char **argv)
 
     Generator gen;
     genGraph = gen.generateGraph(5);
+    
     // Check if graph is connect
     if(graphObj.CheckConnected())
         std::cout << "CONNECTED" << std::endl;
@@ -41,7 +42,7 @@ int main(int argc, char **argv)
         std::cout << "NOT BICONNECTED" << std::endl;
     }
 
-    // Check if graph is biconnected
+    /// Check if graph is commercially acyclic
     if(graphObj.CheckAcyclic())
         std::cout << "ACYCLIC" << std::endl;
     else
