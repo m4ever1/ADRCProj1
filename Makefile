@@ -8,7 +8,7 @@ LIB		:= lib
 
 LIBRARIES	:=
 EXECUTABLE	:= main
-ARGS		:= ./input/small_tree.txt
+ARGS		:= ./input/cyclic.txt
 
 
 all: $(BIN)/$(EXECUTABLE) $(ARGS)

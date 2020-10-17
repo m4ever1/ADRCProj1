@@ -14,7 +14,7 @@ using namespace std;
 class Graph {
     unordered_map<int ,list<Connection>> adjMap; //unordered hasmap of lists of vertices
     int numVertices = 0;
-    void DFSUtil(int , unordered_map<int, bool>*, pair<int, int>*);
+    bool DFSUtil(int , unordered_map<int, bool>*, pair<int, int>*, unordered_map<int, bool>*);
     bool isConnectionCut(int, int, pair<int, int>*);
 public:
     void addVertice(int);

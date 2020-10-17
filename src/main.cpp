@@ -43,9 +43,7 @@ int main(int argc, char **argv)
     if(graphObj.CheckAcyclic())
         std::cout << "ACYCLIC" << std::endl;
     else
-    {   
         std::cout << "CYCLIC" << std::endl;
-    }
            
     return 0;
 }

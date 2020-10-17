@@ -36,23 +36,39 @@ int Graph::getNumVertices()
     // DFS inspired by:
     // https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/
 
-void Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int>* cutC)
+bool Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int>* cutC, unordered_map<int, bool>* finished = nullptr)
 {
-    // Mark the current node as visited and 
-    // print it 
+    // Mark the current node as visited
     (*visited)[vertID] = true; 
-    //std::cout << vertID << " "; 
   
     // Recur for all the vertices adjacent 
     // to this vertex 
     for(auto listEntry : adjMap[vertID])
     {
-        int nextV = listEntry.getDest();
-        if((!(*visited)[nextV]) && !isConnectionCut(vertID, nextV, cutC))//need to build a comparator function for the pairs,
+        int destination = listEntry.getDest();
+        int destinationType = listEntry.getType();
+
+        // If we're doing checks for backlinks we pass a finished nodes map
+        if (finished != nullptr) 
+        {   
+            // If we're checking backlinks we only care for Provider->Customer paths
+            if (destinationType != 1)
+                continue;
+
+            // Check if the it's a backlink
+            if ((*visited)[destination] && !((*finished)[destination])) {
+                return false;
+            }
+        }
+
+        if((!(*visited)[destination]) && !isConnectionCut(vertID, destination, cutC))//need to build a comparator function for the pairs,
         {
-            DFSUtil(nextV, visited, cutC);
+            if (!DFSUtil(destination, visited, cutC, finished))
+                return false;
         }
     }
+
+    return true;
 }
 
 bool Graph::isConnectionCut(int currV, int nextV, pair<int, int>* cutC) 
@@ -107,12 +123,12 @@ bool Graph::CheckBiConnected()
             if(!DFS(src, &cutC))
             {
                 std::cout << "Bridge: Source - " << cutC.first << " Destination - " << cutC.second << std::endl;
-                return(false);
+                return false;
             }
         }
     }
 
-    return(true);
+    return true;
 }
 
 bool Graph::CheckConnected()
@@ -128,67 +144,93 @@ bool Graph::CheckConnected()
     }
 
     // Run DFS on that entry and check if its connected
-    if(!DFS(firstEntry))
-        return(false);
+    if(DFS(firstEntry))
+        return true;
     else
-        return(true);
+        return false;
 
     return(true);
 }
 
 bool Graph::CheckAcyclic()
-{   
+{
     std::cout << "************ CHECK ACYCLIC ************" << std::endl;
 
-    std::queue<int> queue;
-
-    // Create an array of roles: Provider (1) and Customer (3)
-    int roles[] = {1, 3};
-
-    // Mark all the vertices as not visited 
+    unordered_map<int, bool>* finished = new unordered_map<int, bool>;
     unordered_map<int, bool>* visited = new unordered_map<int, bool>;
+
     for (auto mapEntry : adjMap)
     {
         (*visited)[mapEntry.first] = false;
+        (*finished)[mapEntry.first] = false;
     }
-
-    // Iterate through every node
+        
     for (auto mapEntry : adjMap)
     {
-        if ((*visited)[mapEntry.first] == false)
-        {
-            // Mark the node as visited and push it to the queue
-            (*visited)[mapEntry.first] = true;
-            queue.push(mapEntry.first);
+        // Perform DFS and pass a finished nodes map in order to check for backlinks
+        // If DFSUtil returns 'false' then it means it found a backlink and the graph
+        // has a customer-provider cycle
+        if (!DFSUtil(mapEntry.first, visited, nullptr, finished))
+            return false;
 
-            // While the FIFO queue is not empty
-            while(queue.size() != 0)
-            {
-                int frontOfQueue = queue.front();
-                queue.pop();
-
-                for (auto listEntry: adjMap[frontOfQueue])
-                {
-                    int destination = listEntry.getDest();
-                    int destinationType = listEntry.getType();
-
-                    if((*visited)[destination] == true)
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        (*visited)[destination] = true;
-                        queue.push(destination);
-                    }    
-                }
-            }
-        }
+        (*finished)[mapEntry.first] = true;
     }
 
-    free(visited);
     return true;
 }
+
+
+// bool Graph::CheckAcyclic()
+// {   
+//     std::cout << "************ CHECK ACYCLIC ************" << std::endl;
+
+//     std::queue<int> queue;
+
+
+//     // Mark all the vertices as not visited 
+//     unordered_map<int, bool>* visited = new unordered_map<int, bool>;
+//     for (auto mapEntry : adjMap)
+//     {
+//         (*visited)[mapEntry.first] = false;
+//     }
+
+//     // Iterate through every node
+//     for (auto mapEntry : adjMap)
+//     {
+//         if ((*visited)[mapEntry.first] == false)
+//         {
+//             // Mark the node as visited and push it to the queue
+//             (*visited)[mapEntry.first] = true;
+//             queue.push(mapEntry.first);
+
+//             // While the FIFO queue is not empty
+//             while(queue.size() != 0)
+//             {
+//                 int frontOfQueue = queue.front();
+//                 queue.pop();
+
+//                 for (auto listEntry: adjMap[frontOfQueue])
+//                 {
+//                     int destination = listEntry.getDest();
+//                     int destinationType = listEntry.getType();
+
+//                     if((*visited)[destination] == true)
+//                     {
+//                         return false;
+//                     }
+//                     else
+//                     {
+//                         (*visited)[destination] = true;
+//                         queue.push(destination);
+//                     }    
+//                 }
+//             }
+//         }
+//     }
+
+//     free(visited);
+//     return true;
+// }
 
 // unordered_map<int ,list<Connection>> Graph::CloneAdjacencyList()
 // {
