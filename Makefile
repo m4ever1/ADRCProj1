@@ -8,7 +8,7 @@ LIB		:= lib
 
 LIBRARIES	:=
 EXECUTABLE	:= main
-ARGS		:= ./input/enunc.txt
+ARGS		:= ./input/acyclic2.txt
 
 
 all: $(BIN)/$(EXECUTABLE) $(ARGS)

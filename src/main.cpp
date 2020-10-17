@@ -28,32 +28,24 @@ int main(int argc, char **argv)
     Generator gen;
     genGraph = gen.generateGraph(5);
     // Check if graph is connect
-    std::cout << "Is graph CONNECTED?" << std::endl;
-    if(graphObj.checkConnected())
-    {
-        std::cout << "YES" << std::endl;
-    }
+    if(graphObj.CheckConnected())
+        std::cout << "CONNECTED" << std::endl;
     else
-    {
-        std::cout << "no" << std::endl;
-    }
-    
-    std::cout << std::endl;
+        std::cout << "NOT CONNECTED" << std::endl;
 
-    genGraph.printGraph();
-    std::cout << "Number of vertices = " << genGraph.getNumVertices() << std::endl;
-    std::cout << "Is graph CONNECTED?" << std::endl;
-    if(genGraph.checkConnected())
-    {
-        std::cout << "YES" << std::endl;
-    }
-    else
-    {
-        std::cout << "no" << std::endl;
-    }
     // Check if graph is biconnected
+    if(graphObj.CheckBiConnected())
+        std::cout << "BICONNECTED" << std::endl;
+    else
+    {   
+        std::cout << "NOT BICONNECTED" << std::endl;
+    }
 
-    
-
+    // Check if graph is biconnected
+    if(graphObj.CheckAcyclic())
+        std::cout << "ACYCLIC" << std::endl;
+    else
+        std::cout << "CYCLIC" << std::endl;
+           
     return 0;
 }

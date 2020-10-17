@@ -1,4 +1,6 @@
 #include "Graph.hpp"
+#include "Connection.hpp"
+#include <queue>
 
 void Graph::addVertice(int src)
 {
@@ -8,20 +10,18 @@ void Graph::addVertice(int src)
 
 void Graph::addConnection(int src, int dest, int type)
 {
-    if(adjMap.find(src) == adjMap.end()) // key 'src' is not present in the dict
-    {    
-        numVertices++;
-    }
-    numConnections++;
-    adjMap[src].push_back(Connection(dest, type));
+    if (this->adjMap[src].size() == 0)
+        this->numVertices++;
 
+    this->adjMap[src].push_back(Connection(dest, type));
+    
 }
 
 void Graph::removeConnection(int src, int dest, int type)
 {
     adjMap[src].remove(Connection(dest, type));
     if(adjMap.find(src) == adjMap.end()) // key 'src' is not present in the dict
-        numConnections--;
+        this->numVertices--;
 }
 
 bool Graph::doesConnExist(int src, int dest)
@@ -38,36 +38,20 @@ bool Graph::doesConnExist(int src, int dest)
 void Graph::reset() 
 {
     numVertices = 0;
-    numConnections = 0;
     // unordered_map<int ,list<Connection>>::iterator itr;
     adjMap.clear();
 }
 
 void Graph::printGraph()
 {
-    // unordered_map<int ,list<Connection>>::iterator itr;
-    std::list<Connection>::iterator it;
-    int completed = 0;
-    int i = 0;
-    bool done = false;
-    while(!done)
+    std::cout << "**************** GRAPH ****************" << std::endl;
+    for(auto mapEntry : adjMap)
     {
-        for(auto mapEntry : adjMap)
+        std::cout << "Source: " << mapEntry.first << "\n";
+        for(auto listEntry : mapEntry.second)
         {
-            it = mapEntry.second.begin();
-            std::advance(it, i);
-            if(it == mapEntry.second.end())
-            {
-                completed++;
-                continue;
-            }
-            std::cout << mapEntry.first << " " << (*it).getDest() << " " << (*it).getType() << std::endl;  
+            std::cout << "  Destination: " << listEntry.getDest() << " Type: " << listEntry.getType() << std::endl;
         }
-        if(completed >= numVertices)
-        {
-            done = true;
-        }
-        i++;
     }
 }
 
@@ -78,28 +62,47 @@ int Graph::getNumVertices()
     // DFS inspired by:
     // https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/
 
-void Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int>* cutC)
+bool Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int>* cutC, unordered_map<int, bool>* finished = nullptr)
 {
-    // Mark the current node as visited and 
-    // print it 
+    // Mark the current node as visited
     (*visited)[vertID] = true; 
-    // cout << vertID << " "; 
   
     // Recur for all the vertices adjacent 
     // to this vertex 
     for(auto listEntry : adjMap[vertID])
     {
-        int nextV = listEntry.getDest();
-        if((!(*visited)[nextV]) && (cutC == nullptr || !isConnectionCut(vertID, nextV, *cutC)))//need to build a comparator function for the pairs,
+        int destination = listEntry.getDest();
+        int destinationType = listEntry.getType();
+
+        // If we're doing checks for backlinks we pass a finished nodes map
+        if (finished != nullptr) 
+        {   
+            // If we're checking backlinks we only care for Provider->Customer paths
+            if (destinationType != 1)
+                continue;
+
+            // Check if the it's a backlink
+            if ((*visited)[destination] && !((*finished)[destination])) {
+                return false;
+            }
+        }
+
+        if((!(*visited)[destination]) && (cutC == nullptr || !isConnectionCut(vertID, destination, cutC)))//need to build a comparator function for the pairs,
         {
-            DFSUtil(nextV, visited, cutC);
+            if (!DFSUtil(destination, visited, cutC, finished))
+                return false;
         }
     }
+
+    return true;
 }
 
-bool Graph::isConnectionCut(int currV, int nextV, pair<int, int> cutC) 
+bool Graph::isConnectionCut(int currV, int nextV, pair<int, int>* cutC) 
 {
-    return((currV == cutC.first && nextV == cutC.second) || (currV == cutC.second && nextV == cutC.first));
+    if (cutC == nullptr)
+        return false;
+
+    return((currV == cutC->first && nextV == cutC->second) || (currV == cutC->second && nextV == cutC->first));
 }
 
 bool Graph::DFS(int startingV, pair<int, int>* cutC = nullptr)
@@ -136,6 +139,7 @@ bool Graph::checkConnected()
 
 bool Graph::CheckBiConnected()
 {
+    std::cout << "********** CHECK BICONNECTED **********" << std::endl;
     list<pair<int, int>> checkedConnections;
     for (auto mapEntry : adjMap)
     {
@@ -143,15 +147,133 @@ bool Graph::CheckBiConnected()
         {
             int src = mapEntry.first;
             int dest = listEntry.getDest();
+
             // Add to checked connections
             pair<int, int> cutC = make_pair(src, dest);
             checkedConnections.push_back(make_pair(src, dest));
+
             // Check if connected
             if(!DFS(src, &cutC))
             {
-                return(false);
+                std::cout << "Bridge: Source - " << cutC.first << " Destination - " << cutC.second << std::endl;
+                return false;
             }
         }
     }
+
+    return true;
+}
+
+bool Graph::CheckConnected()
+{
+    std::cout << "*********** CHECK CONNECTED ***********" << std::endl;
+    int firstEntry;
+
+    // Get the graph map's first entry
+    for (auto mapEntry : adjMap)
+    {
+        firstEntry = mapEntry.first;
+        break;
+    }
+
+    // Run DFS on that entry and check if its connected
+    if(DFS(firstEntry))
+        return true;
+    else
+        return false;
+
     return(true);
 }
+
+bool Graph::CheckAcyclic()
+{
+    std::cout << "************ CHECK ACYCLIC ************" << std::endl;
+
+    unordered_map<int, bool>* finished = new unordered_map<int, bool>;
+    unordered_map<int, bool>* visited = new unordered_map<int, bool>;
+
+    for (auto mapEntry : adjMap)
+    {
+        (*visited)[mapEntry.first] = false;
+        (*finished)[mapEntry.first] = false;
+    }
+        
+    for (auto mapEntry : adjMap)
+    {
+        // Perform DFS and pass a finished nodes map in order to check for backlinks
+        // If DFSUtil returns 'false' then it means it found a backlink and the graph
+        // has a customer-provider cycle
+        if (!DFSUtil(mapEntry.first, visited, nullptr, finished))
+            return false;
+
+        (*finished)[mapEntry.first] = true;
+    }
+
+    return true;
+}
+
+
+// bool Graph::CheckAcyclic()
+// {   
+//     std::cout << "************ CHECK ACYCLIC ************" << std::endl;
+
+//     std::queue<int> queue;
+
+
+//     // Mark all the vertices as not visited 
+//     unordered_map<int, bool>* visited = new unordered_map<int, bool>;
+//     for (auto mapEntry : adjMap)
+//     {
+//         (*visited)[mapEntry.first] = false;
+//     }
+
+//     // Iterate through every node
+//     for (auto mapEntry : adjMap)
+//     {
+//         if ((*visited)[mapEntry.first] == false)
+//         {
+//             // Mark the node as visited and push it to the queue
+//             (*visited)[mapEntry.first] = true;
+//             queue.push(mapEntry.first);
+
+//             // While the FIFO queue is not empty
+//             while(queue.size() != 0)
+//             {
+//                 int frontOfQueue = queue.front();
+//                 queue.pop();
+
+//                 for (auto listEntry: adjMap[frontOfQueue])
+//                 {
+//                     int destination = listEntry.getDest();
+//                     int destinationType = listEntry.getType();
+
+//                     if((*visited)[destination] == true)
+//                     {
+//                         return false;
+//                     }
+//                     else
+//                     {
+//                         (*visited)[destination] = true;
+//                         queue.push(destination);
+//                     }    
+//                 }
+//             }
+//         }
+//     }
+
+//     free(visited);
+//     return true;
+// }
+
+// unordered_map<int ,list<Connection>> Graph::CloneAdjacencyList()
+// {
+//     unordered_map<int ,list<Connection>> replicaMap;
+
+//     for(auto mapEntry : adjMap)
+//     {
+//         for(auto listEntry : mapEntry.second)
+//         {
+//             replicaMap[mapEntry.first].push_back(Connection(listEntry.getDest(), listEntry.getType());
+//         }
+//     }
+// }
