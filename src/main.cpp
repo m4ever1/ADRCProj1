@@ -43,7 +43,7 @@ int main(int argc, char **argv)
     /*
         TODO: OUTPUT PROVIDER-CUSTOMER CYCLE
     */
-    bool acyclic = graphObj.CheckAcyclic();
+    bool acyclic = !graphObj.CheckCyclic(nullptr);
 
     // Check if graph is commercially connected
     bool commerciallyConnected = graphObj.CheckCommerciallyConnected(connected);

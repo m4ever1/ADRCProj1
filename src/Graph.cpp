@@ -61,7 +61,7 @@ int Graph::getNumVertices()
     // DFS inspired by:
     // https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/
 
-bool Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int>* cutC, unordered_map<int, bool>* finished = nullptr)
+bool Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int>* cutC, unordered_map<int, bool>* recStack = nullptr)
 {
     // Mark the current node as visited
     (*visited)[vertID] = true; 
@@ -74,21 +74,21 @@ bool Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int
         int destinationType = listEntry.getType();
 
         // If we're doing checks for backlinks we pass a finished nodes map
-        if (finished != nullptr) 
+        if (recStack != nullptr) 
         {   
             // If we're checking backlinks we only care for Provider->Customer paths
             if (destinationType != 1)
                 continue;
 
             // Check if the it's a backlink
-            if ((*visited)[destination] && !((*finished)[destination])) {
+            if ((*visited)[destination] && !((*recStack)[destination])) {
                 return false;
             }
         }
 
         if((!(*visited)[destination]) && (cutC == nullptr || !isConnectionCut(vertID, destination, cutC)))//need to build a comparator function for the pairs,
         {
-            if (!DFSUtil(destination, visited, cutC, finished))
+            if (!DFSUtil(destination, visited, cutC, recStack))
                 return false;
         }
     }
@@ -182,15 +182,40 @@ bool Graph::CheckConnected()
     return(true);
 }
 
-bool Graph::CheckAcyclic()
+bool Graph::cyclicUtil(int vertID, unordered_map<int, bool>* visited, unordered_map<int, bool>* recStack)
 {
-    unordered_map<int, bool>* finished = new unordered_map<int, bool>;
+    if(!(*visited)[vertID])
+    {
+        (*visited)[vertID] = true;
+        (*recStack)[vertID] = true;
+
+        for(auto listEntry : adjMap[vertID])
+        {  
+            int dest = listEntry.getDest();
+            int type = listEntry.getType();
+            if(!((*visited)[dest]) && (type == 1) && cyclicUtil(dest, visited, recStack))
+            {
+                return true;
+            }
+            else if((*recStack)[dest] && (type == 1))
+            {
+                return true;
+            }
+        }
+    }
+    (*recStack)[vertID] = false;
+    return false;
+}
+
+bool Graph::CheckCyclic(list<int>* listOut = nullptr)
+{
+    unordered_map<int, bool>* recStack = new unordered_map<int, bool>;
     unordered_map<int, bool>* visited = new unordered_map<int, bool>;
 
     for (auto mapEntry : adjMap)
     {
         (*visited)[mapEntry.first] = false;
-        (*finished)[mapEntry.first] = false;
+        (*recStack)[mapEntry.first] = false;
     }
         
     for (auto mapEntry : adjMap)
@@ -198,14 +223,25 @@ bool Graph::CheckAcyclic()
         // Perform DFS and pass a finished nodes map in order to check for backlinks
         // If DFSUtil returns 'false' then it means it found a backlink and the graph
         // has a customer-provider cycle
-        if (!DFSUtil(mapEntry.first, visited, nullptr, finished))
-            return false;
+        if (cyclicUtil(mapEntry.first, visited, recStack))
+        {
+            if(listOut != nullptr)
+            {
+                for(auto entry : *recStack)
+                {
+                    if(entry.second)
+                    {
+                        (*listOut).push_back(entry.first);
+                    }
+                } 
+            }
+            return true;
+        }
 
-        // Mark the node as finished 
-        (*finished)[mapEntry.first] = true;
     }
-
-    return true;
+    free(recStack);
+    free(visited);
+    return false;
 }
 
 bool Graph::CheckCommerciallyConnected(bool connected)

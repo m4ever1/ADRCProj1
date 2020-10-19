@@ -26,7 +26,8 @@ public:
     bool checkConnected();
     bool CheckBiConnected();
     bool CheckConnected();
-    bool CheckAcyclic();
+    bool cyclicUtil(int , unordered_map<int, bool>*, unordered_map<int, bool>*);
+    bool CheckCyclic(list<int>*);
     bool CheckCommerciallyConnected(bool conencted);
     unordered_map<int ,list<Connection>> CloneAdjacencyList();
     void removeConnection(int, int, int);
