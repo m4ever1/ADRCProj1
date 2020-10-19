@@ -43,7 +43,7 @@ int main(int argc, char **argv)
     /*
         TODO: OUTPUT PROVIDER-CUSTOMER CYCLE
     */
-    bool acyclic = !graphObj.CheckCyclic(nullptr);
+    bool cyclic = graphObj.CheckCyclic(nullptr);
 
     // Check if graph is commercially connected
     bool commerciallyConnected = graphObj.CheckCommerciallyConnected(connected);
@@ -62,10 +62,10 @@ int main(int argc, char **argv)
         std::cout << "NOT BICONNECTED" << std::endl;
 
     std::cout << "************ CHECK ACYCLIC ************" << std::endl;
-    if(acyclic)
-        std::cout << "ACYCLIC" << std::endl;
-    else
+    if(cyclic)
         std::cout << "CYCLIC" << std::endl;
+    else
+        std::cout << "ACYCLIC" << std::endl;
     
     std::cout << "**** CHECK COMMERCIALLY CONNECTED *****" << std::endl;
     if(commerciallyConnected)

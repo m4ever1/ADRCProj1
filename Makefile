@@ -8,7 +8,7 @@ LIB		:= lib
 
 LIBRARIES	:=
 EXECUTABLE	:= main
-ARGS		:= ./input/LargeNetwork.txt
+ARGS		:= ./input/figure1.txt
 
 
 all: $(BIN)/$(EXECUTABLE) $(ARGS)

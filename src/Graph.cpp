@@ -61,7 +61,7 @@ int Graph::getNumVertices()
     // DFS inspired by:
     // https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/
 
-bool Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int>* cutC, unordered_map<int, bool>* recStack = nullptr)
+bool Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int>* cutC, unordered_map<int, bool>* recStack = nullptr, bool commerciallyConnected = false)
 {
     // Mark the current node as visited
     (*visited)[vertID] = true; 
@@ -84,6 +84,13 @@ bool Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int
             if ((*visited)[destination] && !((*recStack)[destination])) {
                 return false;
             }
+        }
+        // If we're checking if the graph is commercially connected, we only allow connections
+        // Provider-Customer (1) and Peer to Peer (3)
+        else if (commerciallyConnected == true)
+        {
+            if (destinationType == 3)
+                continue;
         }
 
         if((!(*visited)[destination]) && (cutC == nullptr || !isConnectionCut(vertID, destination, cutC)))//need to build a comparator function for the pairs,
@@ -130,10 +137,9 @@ bool Graph::checkConnected()
 {
     int src = adjMap.begin()->first;
     if(!DFS(src))
-    {
-        return(false);
-    }
-    return(true);
+        return false;
+
+    return true;
 }
 
 bool Graph::CheckBiConnected()
@@ -246,10 +252,36 @@ bool Graph::CheckCyclic(list<int>* listOut = nullptr)
 
 bool Graph::CheckCommerciallyConnected(bool connected)
 {
+    // If we know the graph is not connected then it means it's also not
+    // commercially connected
     if (!connected)
         return false;
 
-    return true;
+    // Get the first node as a starting point
+    int src = adjMap.begin()->first;
+
+    bool commerciallyConnected = true;
+
+    // Mark all the vertices as not visited 
+    unordered_map<int, bool>* visited = new unordered_map<int, bool>;
+    for (auto mapEntry : adjMap)
+    {
+        (*visited)[mapEntry.first] = false;
+    }
+
+    // Call the recursive helper function 
+    // to print DFS traversal 
+    DFSUtil(src, visited, nullptr, nullptr, true);
+
+    for(auto entry : *visited)// inefficient, better to have a counter inside the DFS stack
+    {
+        if(entry.second == false)
+            commerciallyConnected = false;
+    }
+
+    free(visited);
+
+    return commerciallyConnected;
 }
 
 
