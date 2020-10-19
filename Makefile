@@ -8,7 +8,7 @@ LIB		:= lib
 
 LIBRARIES	:=
 EXECUTABLE	:= main
-ARGS		:= ./input/acyclic2.txt
+ARGS		:= ./input/LargeNetwork.txt
 
 
 all: $(BIN)/$(EXECUTABLE) $(ARGS)

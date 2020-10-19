@@ -22,31 +22,57 @@ int main(int argc, char **argv)
         sscanf(str.c_str(), "%d %d %d\n", &src, &dest, &type);
         graphObj.addConnection(src, dest, type);
     }
-    graphObj.printGraph();
+
+    std::cout << "**************** GRAPH ****************" << std::endl;
+    //graphObj.printGraph();
     std::cout << "Number of vertices = " << graphObj.getNumVertices() << std::endl;
 
     Generator gen;
     genGraph = gen.generateGraph(5);
-    
+
     // Check if graph is connect
-    if(graphObj.CheckConnected())
+    bool connected = graphObj.CheckConnected();
+    
+    // Check if graph is biconnected
+    /* 
+        TODO: OUTPUT BRIDGE
+    */
+    bool biConnected = graphObj.CheckBiConnected();
+
+    // Check if graph is commercially acyclic
+    /*
+        TODO: OUTPUT PROVIDER-CUSTOMER CYCLE
+    */
+    bool acyclic = graphObj.CheckAcyclic();
+
+    // Check if graph is commercially connected
+    bool commerciallyConnected = graphObj.CheckCommerciallyConnected(connected);
+
+    
+    std::cout << "*********** CHECK CONNECTED ***********" << std::endl;
+    if(connected)
         std::cout << "CONNECTED" << std::endl;
     else
         std::cout << "NOT CONNECTED" << std::endl;
 
-    // Check if graph is biconnected
-    if(graphObj.CheckBiConnected())
+    std::cout << "********** CHECK BICONNECTED **********" << std::endl;
+    if(biConnected)
         std::cout << "BICONNECTED" << std::endl;
     else
-    {   
         std::cout << "NOT BICONNECTED" << std::endl;
-    }
 
-    /// Check if graph is commercially acyclic
-    if(graphObj.CheckAcyclic())
+    std::cout << "************ CHECK ACYCLIC ************" << std::endl;
+    if(acyclic)
         std::cout << "ACYCLIC" << std::endl;
     else
         std::cout << "CYCLIC" << std::endl;
+    
+    std::cout << "**** CHECK COMMERCIALLY CONNECTED *****" << std::endl;
+    if(commerciallyConnected)
+        std::cout << "COMMERCIALLY CONNECTED" << std::endl;
+    else
+        std::cout << "NOT COMMERCIALLY CONNECTED" << std::endl;
            
+
     return 0;
 }

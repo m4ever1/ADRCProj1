@@ -44,7 +44,6 @@ void Graph::reset()
 
 void Graph::printGraph()
 {
-    std::cout << "**************** GRAPH ****************" << std::endl;
     for(auto mapEntry : adjMap)
     {
         std::cout << "Source: " << mapEntry.first << "\n";
@@ -139,7 +138,6 @@ bool Graph::checkConnected()
 
 bool Graph::CheckBiConnected()
 {
-    std::cout << "********** CHECK BICONNECTED **********" << std::endl;
     list<pair<int, int>> checkedConnections;
     for (auto mapEntry : adjMap)
     {
@@ -166,7 +164,6 @@ bool Graph::CheckBiConnected()
 
 bool Graph::CheckConnected()
 {
-    std::cout << "*********** CHECK CONNECTED ***********" << std::endl;
     int firstEntry;
 
     // Get the graph map's first entry
@@ -187,8 +184,6 @@ bool Graph::CheckConnected()
 
 bool Graph::CheckAcyclic()
 {
-    std::cout << "************ CHECK ACYCLIC ************" << std::endl;
-
     unordered_map<int, bool>* finished = new unordered_map<int, bool>;
     unordered_map<int, bool>* visited = new unordered_map<int, bool>;
 
@@ -206,8 +201,17 @@ bool Graph::CheckAcyclic()
         if (!DFSUtil(mapEntry.first, visited, nullptr, finished))
             return false;
 
+        // Mark the node as finished 
         (*finished)[mapEntry.first] = true;
     }
+
+    return true;
+}
+
+bool Graph::CheckCommerciallyConnected(bool connected)
+{
+    if (!connected)
+        return false;
 
     return true;
 }
