@@ -8,7 +8,7 @@ LIB		:= lib
 
 LIBRARIES	:=
 EXECUTABLE	:= main
-ARGS		:= ./input/conn_biconn_cyc_comm.txt
+ARGS		:= ./input/figure1.txt
 
 
 all: $(BIN)/$(EXECUTABLE) $(ARGS)

@@ -61,7 +61,7 @@ int Graph::getNumVertices()
     // DFS inspired by:
     // https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/
 
-bool Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int>* cutC, unordered_map<int, bool>* recStack = nullptr, bool commerciallyConnected = false)
+bool Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int>* cutC, int previousType = 0)
 {
     // Mark the current node as visited
     (*visited)[vertID] = true; 
@@ -72,30 +72,31 @@ bool Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int
     {
         int destination = listEntry.getDest();
         int destinationType = listEntry.getType();
+        bool ignore = false;
 
-        // If we're doing checks for backlinks we pass a finished nodes map
-        if (recStack != nullptr) 
+        switch (previousType)
+        {
+            // A provider can only go to other providers (C)
+            // A Peer-to-Peer can only go to other providers (R)
+            case 1:
+                if (destinationType != 1)
+                    ignore = true;
+                break;
+            case 2:
+                if (destinationType != 1)
+                    ignore = true;
+                break;
+            // Everything else can go to every other type of connection (PRC)
+            default:
+                break;
+        }
+
+        if((!ignore) && (!(*visited)[destination]) && (cutC == nullptr || !isConnectionCut(vertID, destination, cutC)))//need to build a comparator function for the pairs,
         {   
-            // If we're checking backlinks we only care for Provider->Customer paths
-            if (destinationType != 1)
-                continue;
+            if (previousType == 0)
+                destinationType = 0;
 
-            // Check if the it's a backlink
-            if ((*visited)[destination] && !((*recStack)[destination])) {
-                return false;
-            }
-        }
-        // If we're checking if the graph is commercially connected, we only allow connections
-        // Provider-Customer (1) and Peer to Peer (2)
-        else if (commerciallyConnected == true)
-        {
-            if (destinationType == 3)
-                continue;
-        }
-
-        if((!(*visited)[destination]) && (cutC == nullptr || !isConnectionCut(vertID, destination, cutC)))//need to build a comparator function for the pairs,
-        {
-            if (!DFSUtil(destination, visited, cutC, recStack))
+            if (!DFSUtil(destination, visited, cutC, destinationType))
                 return false;
         }
     }
@@ -105,9 +106,6 @@ bool Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int
 
 bool Graph::isConnectionCut(int currV, int nextV, pair<int, int>* cutC) 
 {
-    if (cutC == nullptr)
-        return false;
-
     return((currV == cutC->first && nextV == cutC->second) || (currV == cutC->second && nextV == cutC->first));
 }
 
@@ -271,7 +269,7 @@ bool Graph::CheckCommerciallyConnected(bool connected)
 
     // Call the recursive helper function 
     // to print DFS traversal 
-    DFSUtil(src, visited, nullptr, nullptr, true);
+    DFSUtil(src, visited, nullptr, -1);
 
     for(auto entry : *visited)// inefficient, better to have a counter inside the DFS stack
     {
