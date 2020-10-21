@@ -86,7 +86,7 @@ bool Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int
             }
         }
         // If we're checking if the graph is commercially connected, we only allow connections
-        // Provider-Customer (1) and Peer to Peer (3)
+        // Provider-Customer (1) and Peer to Peer (2)
         else if (commerciallyConnected == true)
         {
             if (destinationType == 3)
