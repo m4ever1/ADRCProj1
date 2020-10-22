@@ -61,7 +61,7 @@ int Graph::getNumVertices()
     // DFS inspired by:
     // https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/
 
-bool Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int>* cutC, int previousType = 0)
+bool Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int>* cutC = nullptr, int previousType = 0)
 {
     // Mark the current node as visited
     (*visited)[vertID] = true; 
@@ -256,30 +256,38 @@ bool Graph::CheckCommerciallyConnected(bool connected)
         return false;
 
     // Get the first node as a starting point
-    int src = adjMap.begin()->first;
-
-    bool commerciallyConnected = true;
+    int src;
 
     // Mark all the vertices as not visited 
     unordered_map<int, bool>* visited = new unordered_map<int, bool>;
-    for (auto mapEntry : adjMap)
-    {
-        (*visited)[mapEntry.first] = false;
-    }
+
 
     // Call the recursive helper function 
     // to print DFS traversal 
-    DFSUtil(src, visited, nullptr, -1);
-
-    for(auto entry : *visited)// inefficient, better to have a counter inside the DFS stack
+    for(auto mapEntry : adjMap)
     {
-        if(entry.second == false)
-            commerciallyConnected = false;
+        for (auto mapEntry : adjMap)
+        {
+            (*visited)[mapEntry.first] = false;
+        }
+        src = mapEntry.first;
+        DFSUtil(src, visited, nullptr, -1);
+
+        for(auto entry : *visited)// inefficient, better to have a counter inside the DFS stack
+        {
+            if(entry.second == false)
+            {    
+                free(visited);
+                return false;
+            }
+        }
     }
 
-    free(visited);
 
-    return commerciallyConnected;
+
+
+    free(visited);
+    return true;
 }
 
 

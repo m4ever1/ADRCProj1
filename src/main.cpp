@@ -24,11 +24,11 @@ int main(int argc, char **argv)
     }
 
     std::cout << "**************** GRAPH ****************" << std::endl;
-    //graphObj.printGraph();
+    // graphObj.printGraph();
     std::cout << "Number of vertices = " << graphObj.getNumVertices() << std::endl;
 
-    Generator gen;
-    genGraph = gen.generateGraph(5);
+    // Generator gen;
+    // genGraph = gen.generateGraph(5);
 
     // Check if graph is connect
     bool connected = graphObj.CheckConnected();
@@ -46,6 +46,7 @@ int main(int argc, char **argv)
     bool cyclic = graphObj.CheckCyclic(nullptr);
 
     // Check if graph is commercially connected
+
     bool commerciallyConnected = graphObj.CheckCommerciallyConnected(connected);
 
     
@@ -61,9 +62,9 @@ int main(int argc, char **argv)
     else
         std::cout << "NOT BICONNECTED" << std::endl;
 
-    std::cout << "************ CHECK ACYCLIC ************" << std::endl;
+    std::cout << "************ CHECK COMMERCIALLY ACYCLIC ************" << std::endl;
     if(cyclic)
-        std::cout << "CYCLIC" << std::endl;
+        std::cout << "COMMERCIALLY CYCLIC" << std::endl;
     else
         std::cout << "ACYCLIC" << std::endl;
     
@@ -73,6 +74,6 @@ int main(int argc, char **argv)
     else
         std::cout << "NOT COMMERCIALLY CONNECTED" << std::endl;
            
-
+    graphObj.printGraph();
     return 0;
 }
