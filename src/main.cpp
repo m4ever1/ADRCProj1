@@ -74,6 +74,8 @@ int main(int argc, char **argv)
     else
         std::cout << "NOT COMMERCIALLY CONNECTED" << std::endl;
            
-    graphObj.printGraph();
+    // graphObj.printGraph();
+    Graph newG = graphObj.GetSSCGraph(1, false);
+    newG.printGraph();
     return 0;
 }

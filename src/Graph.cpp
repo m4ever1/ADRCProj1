@@ -11,8 +11,7 @@ void Graph::addVertice(int src)
 void Graph::addConnection(int src, int dest, int type)
 {
     if (this->adjMap[src].size() == 0)
-        this->numVertices++;
-
+        this->numVertices++; 
     this->adjMap[src].push_back(Connection(dest, type));
     
 }
@@ -22,6 +21,97 @@ void Graph::removeConnection(int src, int dest, int type)
     adjMap[src].remove(Connection(dest, type));
     if(adjMap.find(src) == adjMap.end()) // key 'src' is not present in the dict
         this->numVertices--;
+}
+
+
+list<Graph> Graph::GetSSCGraph(int startingV, bool fullGraph = false) 
+{
+
+    unordered_map<int, int>* pre = new unordered_map<int,int>;
+    unordered_map<int, int>* post = new unordered_map<int,int>;
+    unordered_map<int, bool>* visited = new unordered_map<int,bool>;
+
+    for(auto mapEntry : adjMap)
+    {
+        (*visited)[mapEntry.first] = false;
+    }
+    int time = 1;
+    DFSwTimingsUtil(startingV, pre, post, visited, &time, false, nullptr);
+    pair<int, int> lastV = keyWithLargestValue(*post);
+    
+    for(auto mapEntry : adjMap)
+    {
+        (*visited)[mapEntry.first] = false;
+    }
+    Graph SSC;
+    if (fullGraph)
+    {
+        while (!(post->empty()))
+        {
+            /* code */
+        }
+        
+        
+    }
+    else
+    {
+        DFSwTimingsUtil(lastV.first, nullptr, post, visited, &time, true, &SSC);
+    }
+    
+    
+    
+
+    // return SSC;
+
+
+}
+
+
+void Graph::DFSwTimingsUtil(int vertID, unordered_map<int, int>* pre, unordered_map<int,int>* post, 
+unordered_map<int, bool>* visited, int* time, bool reversed, Graph* outputG) 
+{
+    if(!reversed)
+    {
+        (*visited)[vertID] = true;
+        (*pre)[vertID] = *time;
+        (*time)++;
+
+        int desiredType = 1;
+ 
+        for(auto listEntry : adjMap[vertID])
+        {
+            int dest = listEntry.getDest();
+            int type = listEntry.getType();
+            if(!(*visited)[dest] && type == desiredType)
+            {
+                DFSwTimingsUtil(dest, pre, post, visited, time, reversed, nullptr);
+            }
+        }
+        (*post)[vertID] = *time;
+        (*time)++;
+    }
+    else
+    {
+        (*visited)[vertID] = true;
+        (*post).erase(vertID);
+        int desiredType = 3;
+        for(auto listEntry : adjMap[vertID])
+        {
+            int dest = listEntry.getDest();
+            int type = listEntry.getType();
+            if(type == desiredType)
+            {
+                (*outputG).addConnection(vertID, dest, type);
+                (*outputG).addConnection(dest, vertID, Connection::getReciprocalType(type));
+                if(!(*visited)[dest])
+                {
+                    DFSwTimingsUtil(dest, pre, post, visited, time, reversed, outputG);
+                }
+            }
+        }
+    }
+    
+
 }
 
 bool Graph::doesConnExist(int src, int dest)
@@ -115,7 +205,7 @@ bool Graph::DFS(int startingV, pair<int, int>* cutC = nullptr)
     // Mark all the vertices as not visited 
     unordered_map<int, bool>* visited = new unordered_map<int, bool>;
     for (auto mapEntry : adjMap)
-    {
+    { 
         (*visited)[mapEntry.first] = false;
     }
     // Call the recursive helper function 

@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <utility> 
 #include "Connection.hpp"
+#include "utils.hpp"
 
 using namespace std;
 
@@ -31,5 +32,7 @@ public:
     bool CheckCommerciallyConnected(bool conencted);
     unordered_map<int ,list<Connection>> CloneAdjacencyList();
     void removeConnection(int, int, int);
+    list<Graph> GetSSCGraph(int, bool);
+    void DFSwTimingsUtil(int, unordered_map<int, int>*, unordered_map<int,int>*, unordered_map<int, bool>*, int*, bool, Graph*);
     void reset();
 };
