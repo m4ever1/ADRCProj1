@@ -1,6 +1,7 @@
 #include "Graph.hpp"
 #include "Connection.hpp"
 #include <queue>
+#include <list>
 
 void Graph::addVertice(int src)
 {
@@ -12,6 +13,12 @@ void Graph::addConnection(int src, int dest, int type)
 {
     if (this->adjMap[src].size() == 0)
         this->numVertices++; 
+
+    if (src > maxValue)
+        this->maxValue = src;
+    else if (dest > maxValue)
+        this->maxValue = dest;
+
     this->adjMap[src].push_back(Connection(dest, type));
     
 }
@@ -24,9 +31,8 @@ void Graph::removeConnection(int src, int dest, int type)
 }
 
 
-list<Graph> Graph::GetSSCGraph(int startingV, bool fullGraph = false) 
+void Graph::GetSSCGraph(int startingV, bool fullGraph = false) 
 {
-
     unordered_map<int, int>* pre = new unordered_map<int,int>;
     unordered_map<int, int>* post = new unordered_map<int,int>;
     unordered_map<int, bool>* visited = new unordered_map<int,bool>;
@@ -36,22 +42,71 @@ list<Graph> Graph::GetSSCGraph(int startingV, bool fullGraph = false)
         (*visited)[mapEntry.first] = false;
     }
     int time = 1;
+
     DFSwTimingsUtil(startingV, pre, post, visited, &time, false, nullptr);
-    pair<int, int> lastV = keyWithLargestValue(*post);
     
     for(auto mapEntry : adjMap)
     {
         (*visited)[mapEntry.first] = false;
     }
+
     Graph SSC;
+    pair<int, int> lastV;
+
     if (fullGraph)
     {
         while (!(post->empty()))
         {
-            /* code */
-        }
-        
-        
+            pair<int, int> lastV = keyWithLargestValue(*post);
+            cout << "Oldest discovered: " << lastV.first << " Value: " << lastV.second << endl;
+
+            this->maxValue = this->maxValue + 1;
+            Graph SSC;
+
+            DFSwTimingsUtil(lastV.first, nullptr, post, visited, &time, true, &SSC);
+            
+            SSC.printGraph();
+            cout << "*********" << endl;
+
+            // Iterate through every node in the discovered cycle
+            for (auto node : SSC.adjMap)
+            {
+                // Check if the node is in the original map
+                //if (this->adjMap.find(node.first) == this->adjMap.end())
+                //{
+                    // In every connection of every node in the discovered cycle
+                    for (auto connection : node.second)
+                    {
+                        int destination = connection.getDest();
+                        int destinationType = connection.getType();
+
+                        // If the connection exists in the original map's connection list
+                        // of the node in question we remove it
+                        bool foundConnection = false;
+                        for (auto listEntry : this->adjMap[node.first])
+                        {
+                            // If we find the 
+                            if (connection == listEntry)
+                            {
+                                foundConnection = true;
+ 
+                                this->adjMap[node.first].remove(listEntry);
+                                break;
+                            }
+                        }
+
+                        // We use max value in order to create a new connection to a new node
+                        // where the new node will be an aggregate of every node that belongs to the cycle
+                        if (!foundConnection)
+                        {
+                            this->addConnection(this->maxValue, destination, destinationType);
+                        }   
+                   }
+               //}
+
+                adjMap.erase(node.first);
+           }
+        }   
     }
     else
     {
@@ -59,16 +114,20 @@ list<Graph> Graph::GetSSCGraph(int startingV, bool fullGraph = false)
     }
     
     
-    
-
-    // return SSC;
-
-
+    cout << "Final Adjacency List" << endl;
+    this->printGraph();
 }
 
 
-void Graph::DFSwTimingsUtil(int vertID, unordered_map<int, int>* pre, unordered_map<int,int>* post, 
-unordered_map<int, bool>* visited, int* time, bool reversed, Graph* outputG) 
+void Graph::DFSwTimingsUtil(
+    int vertID, 
+    unordered_map<int, int>* pre, 
+    unordered_map<int,int>* post, 
+    unordered_map<int, bool>* visited, 
+    int* time, 
+    bool reversed, 
+    Graph* outputG
+) 
 {
     if(!reversed)
     {
@@ -94,6 +153,7 @@ unordered_map<int, bool>* visited, int* time, bool reversed, Graph* outputG)
     {
         (*visited)[vertID] = true;
         (*post).erase(vertID);
+
         int desiredType = 3;
         for(auto listEntry : adjMap[vertID])
         {
@@ -110,8 +170,6 @@ unordered_map<int, bool>* visited, int* time, bool reversed, Graph* outputG)
             }
         }
     }
-    
-
 }
 
 bool Graph::doesConnExist(int src, int dest)

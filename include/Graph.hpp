@@ -15,6 +15,7 @@ using namespace std;
 class Graph {
     unordered_map<int ,list<Connection>> adjMap; //unordered hasmap of lists of vertices
     int numVertices = 0;
+    int maxValue = -1;
     bool DFSUtil(int , unordered_map<int, bool>*, pair<int, int>*, int);
     bool isConnectionCut(int, int, pair<int, int>*);
 public:
@@ -32,7 +33,7 @@ public:
     bool CheckCommerciallyConnected(bool conencted);
     unordered_map<int ,list<Connection>> CloneAdjacencyList();
     void removeConnection(int, int, int);
-    list<Graph> GetSSCGraph(int, bool);
+    void GetSSCGraph(int, bool);
     void DFSwTimingsUtil(int, unordered_map<int, int>*, unordered_map<int,int>*, unordered_map<int, bool>*, int*, bool, Graph*);
     void reset();
 };

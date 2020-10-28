@@ -8,7 +8,7 @@ LIB		:= lib
 
 LIBRARIES	:=
 EXECUTABLE	:= main
-ARGS		:= ./input/figure1.txt
+ARGS		:= ./input/SSC.txt
 
 
 all: $(BIN)/$(EXECUTABLE) $(ARGS)
@@ -21,6 +21,7 @@ $(BIN)/$(EXECUTABLE): $(SRC)/*.cpp
 	[ -d $(LIB) ] || mkdir -p $(LIB)
 	[ -d $(BIN) ] || mkdir -p $(BIN)
 	$(CXX) $(CXX_FLAGS) -I$(INCLUDE) -L$(LIB) $^ -o $@ $(LIBRARIES)
+	chmod a+x $(BIN)/$(EXECUTABLE)
 
 clean:
 	-rm $(BIN)/*

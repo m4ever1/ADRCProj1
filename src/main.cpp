@@ -1,6 +1,7 @@
 #include "Io.hpp"
 #include "Graph.hpp"
 #include "Generator.hpp"
+#include <list>
 
 int main(int argc, char **argv) 
 {
@@ -75,7 +76,6 @@ int main(int argc, char **argv)
         std::cout << "NOT COMMERCIALLY CONNECTED" << std::endl;
            
     // graphObj.printGraph();
-    Graph newG = graphObj.GetSSCGraph(1, false);
-    newG.printGraph();
+    graphObj.GetSSCGraph(1, true);
     return 0;
 }
