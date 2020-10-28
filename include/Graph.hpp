@@ -13,6 +13,7 @@ using namespace std;
 // idem...
 
 class Graph {
+protected:
     unordered_map<int ,list<Connection>> adjMap; //unordered hasmap of lists of vertices
     int numVertices = 0;
     int maxValue = -1;
@@ -30,10 +31,10 @@ public:
     bool CheckConnected();
     bool cyclicUtil(int , unordered_map<int, bool>*, unordered_map<int, bool>*);
     bool CheckCyclic(list<int>*);
-    bool CheckCommerciallyConnected(bool conencted);
+    bool CheckCommerciallyConnected(bool);
     unordered_map<int ,list<Connection>> CloneAdjacencyList();
     void removeConnection(int, int, int);
-    void GetSSCGraph(int, bool);
-    void DFSwTimingsUtil(int, unordered_map<int, int>*, unordered_map<int,int>*, unordered_map<int, bool>*, int*, bool, Graph*);
+    bool GetSSCGraph(int, Graph*, bool);
+    void DFSwTimingsUtil(int, unordered_map<int, int>*, unordered_map<int,int>*, unordered_map<int, bool>*, int*, bool, Graph*, list<Connection>*, list<int>*);
     void reset();
 };

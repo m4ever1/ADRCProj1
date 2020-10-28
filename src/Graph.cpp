@@ -1,5 +1,6 @@
 #include "Graph.hpp"
 #include "Connection.hpp"
+#include "SimpGraph.hpp"
 #include <queue>
 #include <list>
 
@@ -23,6 +24,7 @@ void Graph::addConnection(int src, int dest, int type)
     
 }
 
+
 void Graph::removeConnection(int src, int dest, int type)
 {
     adjMap[src].remove(Connection(dest, type));
@@ -31,7 +33,7 @@ void Graph::removeConnection(int src, int dest, int type)
 }
 
 
-void Graph::GetSSCGraph(int startingV, bool fullGraph = false) 
+bool Graph::GetSSCGraph(int startingV, Graph* outputG, bool fullGraph = false) 
 {
     unordered_map<int, int>* pre = new unordered_map<int,int>;
     unordered_map<int, int>* post = new unordered_map<int,int>;
@@ -42,80 +44,53 @@ void Graph::GetSSCGraph(int startingV, bool fullGraph = false)
         (*visited)[mapEntry.first] = false;
     }
     int time = 1;
-
-    DFSwTimingsUtil(startingV, pre, post, visited, &time, false, nullptr);
+    bool connected = true;
+    DFSwTimingsUtil(startingV, pre, post, visited, &time, false, nullptr, nullptr, nullptr);
     
     for(auto mapEntry : adjMap)
     {
+        if (!(*visited)[mapEntry.first])
+        {
+            connected = false;
+        }
+        
         (*visited)[mapEntry.first] = false;
     }
 
-    Graph SSC;
+
     pair<int, int> lastV;
+    SimpGraph SSC;
 
     if (fullGraph)
     {
+        list<Connection> connList; 
+        list<int> vertList;
         while (!(post->empty()))
         {
             pair<int, int> lastV = keyWithLargestValue(*post);
             cout << "Oldest discovered: " << lastV.first << " Value: " << lastV.second << endl;
 
             this->maxValue = this->maxValue + 1;
-            Graph SSC;
+ 
 
-            DFSwTimingsUtil(lastV.first, nullptr, post, visited, &time, true, &SSC);
-            
+            DFSwTimingsUtil(lastV.first, nullptr, post, visited, &time, true, nullptr, &connList, &vertList);
+            SSC.aggregateV(vertList, connList);
             SSC.printGraph();
+            connList.clear();
+            vertList.clear();
             cout << "*********" << endl;
 
-            // Iterate through every node in the discovered cycle
-            for (auto node : SSC.adjMap)
-            {
-                // Check if the node is in the original map
-                //if (this->adjMap.find(node.first) == this->adjMap.end())
-                //{
-                    // In every connection of every node in the discovered cycle
-                    for (auto connection : node.second)
-                    {
-                        int destination = connection.getDest();
-                        int destinationType = connection.getType();
-
-                        // If the connection exists in the original map's connection list
-                        // of the node in question we remove it
-                        bool foundConnection = false;
-                        for (auto listEntry : this->adjMap[node.first])
-                        {
-                            // If we find the 
-                            if (connection == listEntry)
-                            {
-                                foundConnection = true;
- 
-                                this->adjMap[node.first].remove(listEntry);
-                                break;
-                            }
-                        }
-
-                        // We use max value in order to create a new connection to a new node
-                        // where the new node will be an aggregate of every node that belongs to the cycle
-                        if (!foundConnection)
-                        {
-                            this->addConnection(this->maxValue, destination, destinationType);
-                        }   
-                   }
-               //}
-
-                adjMap.erase(node.first);
-           }
         }   
     }
     else
     {
-        DFSwTimingsUtil(lastV.first, nullptr, post, visited, &time, true, &SSC);
+        Graph SSC;
+        DFSwTimingsUtil(lastV.first, nullptr, post, visited, &time, true, &SSC, nullptr, nullptr);
     }
     
     
     cout << "Final Adjacency List" << endl;
-    this->printGraph();
+   (SSC).printGraph();
 }
 
 
@@ -126,7 +101,9 @@ void Graph::DFSwTimingsUtil(
     unordered_map<int, bool>* visited, 
     int* time, 
     bool reversed, 
-    Graph* outputG
+    Graph* outputG,
+    list<Connection>* connList,
+    list<int>* vertList
 ) 
 {
     if(!reversed)
@@ -143,7 +120,7 @@ void Graph::DFSwTimingsUtil(
             int type = listEntry.getType();
             if(!(*visited)[dest] && type == desiredType)
             {
-                DFSwTimingsUtil(dest, pre, post, visited, time, reversed, nullptr);
+                DFSwTimingsUtil(dest, pre, post, visited, time, reversed, nullptr, nullptr, nullptr);
             }
         }
         (*post)[vertID] = *time;
@@ -151,6 +128,7 @@ void Graph::DFSwTimingsUtil(
     }
     else
     {
+        (*vertList).push_back(vertID);
         (*visited)[vertID] = true;
         (*post).erase(vertID);
 
@@ -161,13 +139,23 @@ void Graph::DFSwTimingsUtil(
             int type = listEntry.getType();
             if(type == desiredType)
             {
-                (*outputG).addConnection(vertID, dest, type);
-                (*outputG).addConnection(dest, vertID, Connection::getReciprocalType(type));
+                // (*outputG).addConnection(vertID, dest, type);
+                // (*outputG).addConnection(dest, vertID, Connection::getReciprocalType(type));
                 if(!(*visited)[dest])
                 {
-                    DFSwTimingsUtil(dest, pre, post, visited, time, reversed, outputG);
+                    DFSwTimingsUtil(dest, pre, post, visited, time, reversed, outputG, connList, vertList);
                 }
+                else
+                {
+                    (*connList).push_back(Connection(dest, type));
+                }
+                
             }
+            else
+            {
+                (*connList).push_back(Connection(dest, type));
+            }
+            
         }
     }
 }
