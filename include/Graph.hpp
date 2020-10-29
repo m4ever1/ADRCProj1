@@ -6,6 +6,7 @@
 #include <algorithm>
 #include "Connection.hpp"
 #include "utils.hpp"
+#include <unordered_set>
 
 
 using namespace std;

@@ -54,13 +54,11 @@ bool Graph::GetSCCGraph(int startingV, Graph* outputG, bool fullGraph = false) /
         (*visited)[mapEntry.first] = false;
     }
     int time = 1;
-    bool connected = true;
     DFSwTimingsUtil(startingV, pre, post, visited, &time, false, nullptr, nullptr, nullptr);
     for(auto mapEntry : adjMap)
     {
         if(!(*visited)[mapEntry.first])
         {
-            (time)++;
             DFSwTimingsUtil(mapEntry.first, pre, post, visited, &time, false, nullptr, nullptr, nullptr);
         }
     }
@@ -107,6 +105,7 @@ bool Graph::GetSCCGraph(int startingV, Graph* outputG, bool fullGraph = false) /
     }
     else
     {
+        //NEEDS CHANGE, ONLY FINDS A CYCLE IF IT HAS THE LASTV vertice IN IT!!!!!!!
         lastV = keyWithLargestValue(*post);
         DFSwTimingsUtil(lastV.first, nullptr, post, visited, &time, true, outputG, &connList, &vertList);
 
@@ -448,8 +447,6 @@ bool Graph::CheckCommerciallyConnectedFast()
         mapToUse = adjMap;
     }
     
-    
-
     std::list<int> checkList;
     bool check = true;
     for (auto mapEntry : mapToUse)
@@ -470,19 +467,40 @@ bool Graph::CheckCommerciallyConnectedFast()
     {
         return true;
     }
-
-    std::list<int>::iterator at;
-    for(auto entry : checkList)
+    //SUBSTITUIDO POR DFS LMAOOOO
+    unordered_set<int> set;
+    for (auto entry: checkList)
     {
-        for(auto conn : mapToUse[entry])
+        for(auto conn: mapToUse[entry])
         {
-            at = std::find(checkList.begin() , checkList.end(), conn.getDest());
-            if(at == checkList.end())
+            set.insert(conn.getDest());
+        }
+        for(auto otherEntry: checkList)
+        {
+            if(otherEntry == entry)
+                continue;
+            if(set.find(otherEntry) == set.end())
             {
+                simpleG->printGraph();
+                free(simpleG);
                 return false;
             }
         }
+        set.clear();
     }
+    // std::list<int>::iterator at;
+    // for(auto entry : checkList)
+    // {
+    //     for(auto conn : mapToUse[entry])
+    //     {
+    //         at = std::find(checkList.begin() , checkList.end(), conn.getDest());
+    //         if(at == checkList.end())
+    //         {    
+    //             free(simpleG);
+    //             return false;
+    //         }
+    //     }
+    // }
     simpleG->printGraph();
     free(simpleG);
     return true;
