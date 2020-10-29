@@ -3,8 +3,10 @@
 #include <list>
 #include <unordered_map>
 #include <utility> 
+#include <algorithm>
 #include "Connection.hpp"
 #include "utils.hpp"
+
 
 using namespace std;
 
@@ -15,6 +17,7 @@ using namespace std;
 class Graph {
 protected:
     unordered_map<int ,list<Connection>> adjMap; //unordered hasmap of lists of vertices
+    unordered_map<int, int> redirectMap;
     int numVertices = 0;
     int maxValue = -1;
     bool DFSUtil(int , unordered_map<int, bool>*, pair<int, int>*, int);
@@ -32,9 +35,24 @@ public:
     bool cyclicUtil(int , unordered_map<int, bool>*, unordered_map<int, bool>*);
     bool CheckCyclic(list<int>*);
     bool CheckCommerciallyConnected(bool);
+    bool CheckCommerciallyConnectedFast();
     unordered_map<int ,list<Connection>> CloneAdjacencyList();
     void removeConnection(int, int, int);
-    bool GetSSCGraph(int, Graph*, bool);
-    void DFSwTimingsUtil(int, unordered_map<int, int>*, unordered_map<int,int>*, unordered_map<int, bool>*, int*, bool, Graph*, list<Connection>*, list<int>*);
+    bool CheckCyclicFast(Graph*);
+    bool GetSCCGraph(int, Graph*, bool);
+    void DFSwTimingsUtil(int, 
+        unordered_map<int, int>*, 
+        unordered_map<int,int>*, 
+        unordered_map<int, bool>*, 
+        int*, 
+        bool, 
+        Graph*, 
+        list<Connection>*, 
+        list<int>*);
+
+    void aggregateV(list<int>, list<Connection>);
+    void connectVtoList(int, list<Connection>);
+    unordered_map<int ,list<Connection>> getAdjMap();
     void reset();
 };
+

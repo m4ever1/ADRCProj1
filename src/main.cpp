@@ -1,6 +1,7 @@
 #include "Io.hpp"
 #include "Graph.hpp"
 #include "Generator.hpp"
+#include "SimpGraph.hpp"
 #include <list>
 
 int main(int argc, char **argv) 
@@ -76,6 +77,29 @@ int main(int argc, char **argv)
         std::cout << "NOT COMMERCIALLY CONNECTED" << std::endl;
            
     // graphObj.printGraph();
-    graphObj.GetSSCGraph(1, true);
+    Graph* cicle = new Graph;
+    bool ciclic = graphObj.CheckCyclicFast(cicle);
+    std::cout << "END" << std::endl << std::endl << std::endl;
+    cicle->printGraph();
+    if(ciclic)
+    {
+        std::cout << "Cyclic" << std::endl;
+    }
+    else
+    {
+        std::cout << "Not Cyclic" << std::endl;
+    }
+
+    bool CC = graphObj.CheckCommerciallyConnectedFast();
+    if(CC)
+    {
+        std::cout << "CC" << std::endl;
+    }
+    else
+    {
+        std::cout << "Not CC" << std::endl;
+    }
+    
+    free(cicle);
     return 0;
 }
