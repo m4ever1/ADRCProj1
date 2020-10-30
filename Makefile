@@ -8,13 +8,12 @@ LIB		:= lib
 
 LIBRARIES	:=
 EXECUTABLE	:= main
-ARGS		:= ./input/SSC.txt
+ARGS		:= ./input/cyc_ncc.txt
 
 
 all: $(BIN)/$(EXECUTABLE) $(ARGS)
 
 run: clean all
-	clear
 	./$(BIN)/$(EXECUTABLE) $(ARGS)
 
 $(BIN)/$(EXECUTABLE): $(SRC)/*.cpp

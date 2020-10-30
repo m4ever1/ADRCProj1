@@ -7,6 +7,7 @@
 #include "Connection.hpp"
 #include "utils.hpp"
 #include <unordered_set>
+#include <stack>
 
 
 using namespace std;
@@ -43,15 +44,14 @@ public:
     bool GetSCCGraph(int, Graph*, bool);
     void DFSwTimingsUtil(int, 
         unordered_map<int, int>*, 
-        unordered_map<int,int>*, 
+        stack<int>*, 
         unordered_map<int, bool>*, 
         int*, 
         bool, 
-        Graph*, 
-        list<Connection>*, 
+        Graph*,
         list<int>*);
 
-    void aggregateV(list<int>, list<Connection>);
+    void aggregateV(list<int>);
     void connectVtoList(int, list<Connection>);
     unordered_map<int ,list<Connection>> getAdjMap();
     void reset();

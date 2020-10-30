@@ -3,6 +3,8 @@
 #include <queue>
 #include <list>
 
+using namespace std;
+
 void Graph::addVertice(int src)
 {
     adjMap[src] = {};
@@ -45,75 +47,65 @@ bool Graph::CheckCyclicFast(Graph* outputG)
 
 bool Graph::GetSCCGraph(int startingV, Graph* outputG, bool fullGraph = false) //returns true if cyclic
 {
-    unordered_map<int, int>* pre = new unordered_map<int,int>;
-    unordered_map<int, int>* post = new unordered_map<int,int>;
-    unordered_map<int, bool>* visited = new unordered_map<int,bool>;
+    unordered_map<int, int> pre;
+    stack<int> post;
+    unordered_map<int, bool> visited;
 
     for(auto mapEntry : adjMap)
     {
-        (*visited)[mapEntry.first] = false;
+        (visited)[mapEntry.first] = false;
     }
     int time = 1;
-    DFSwTimingsUtil(startingV, pre, post, visited, &time, false, nullptr, nullptr, nullptr);
+    DFSwTimingsUtil(startingV, &pre, &post, &visited, &time, false, nullptr, nullptr);
     for(auto mapEntry : adjMap)
     {
-        if(!(*visited)[mapEntry.first])
+        if(!(visited)[mapEntry.first])
         {
-            DFSwTimingsUtil(mapEntry.first, pre, post, visited, &time, false, nullptr, nullptr, nullptr);
+            DFSwTimingsUtil(mapEntry.first, &pre, &post, &visited, &time, false, nullptr, nullptr);
         }
     }
     for(auto mapEntry : adjMap)
     {   
-        (*visited)[mapEntry.first] = false;
+        (visited)[mapEntry.first] = false;
     }
 
-    pair<int, int> lastV;
-
-    list<Connection> connList; 
     list<int> vertList;
-    if (fullGraph)
+
+    while (!(post.empty()))
     {
+        // cout << "Oldest discovered: " << (post)->top() << endl;
 
-        while (!(post->empty()))
+        DFSwTimingsUtil(post.top(), nullptr, &post, &visited, &time, true, nullptr, &vertList);
+        if(!fullGraph)
         {
-            lastV = keyWithLargestValue(*post);
-            cout << "Oldest discovered: " << lastV.first << " Value: " << lastV.second << endl;
-
-            this->maxValue = this->maxValue + 1;
- 
-
-            DFSwTimingsUtil(lastV.first, nullptr, post, visited, &time, true, nullptr, &connList, &vertList);
-            (*outputG).aggregateV(vertList, connList);
-            // (*outputG).printGraph();
-            connList.clear();
-            vertList.clear();
-            cout << "*********" << endl;
-        }
-        for (auto mapEntry : adjMap)
-        {
-            for(auto entry: mapEntry.second)
+            if(vertList.size() > 1)
             {
-                int newNode = (*outputG).redirectMap[mapEntry.first];
-                int oldDest = entry.getDest();
-                int newDest = (*outputG).redirectMap[oldDest];
-                int type = entry.getType();
-                if(newDest != newNode && oldDest != newDest)
-                    (*outputG).addConnection(newNode, newDest, type);
+                return true;
             }
         }
-           
-    }
-    else
-    {
-        //NEEDS CHANGE, ONLY FINDS A CYCLE IF IT HAS THE LASTV vertice IN IT!!!!!!!
-        lastV = keyWithLargestValue(*post);
-        DFSwTimingsUtil(lastV.first, nullptr, post, visited, &time, true, outputG, &connList, &vertList);
+        (*outputG).aggregateV(vertList);
 
+        // (*outputG).printGraph();
+        vertList.clear();
+        // cout << "*********" << endl;
     }
-    
+    for (auto mapEntry : adjMap)
+    {
+        for(auto entry: mapEntry.second)
+        {
+            int newNode = (*outputG).redirectMap[mapEntry.first];
+            int oldDest = entry.getDest();
+            int newDest = (*outputG).redirectMap[oldDest];
+            int type = entry.getType();
+            if(newDest != newNode && oldDest != newDest)
+{                (*outputG).addConnection(newNode, newDest, type);
+                (*outputG).addConnection(newDest, newNode, Connection::getReciprocalType(type));}
+        }
+    }
+           
     cout << "Final Adjacency List" << endl;
-    if(outputG != nullptr)
-        (*outputG).printGraph();
+    // if(outputG != nullptr)
+    //     // (*outputG).printGraph();
 
     if ((*outputG).getNumVertices() > 1)
     {
@@ -129,12 +121,11 @@ bool Graph::GetSCCGraph(int startingV, Graph* outputG, bool fullGraph = false) /
 void Graph::DFSwTimingsUtil(
     int vertID, 
     unordered_map<int, int>* pre, 
-    unordered_map<int,int>* post, 
+    stack<int>* post, 
     unordered_map<int, bool>* visited, 
     int* time, 
     bool reversed, 
     Graph* outputG,
-    list<Connection>* connList,
     list<int>* vertList
 ) 
 {
@@ -154,19 +145,18 @@ void Graph::DFSwTimingsUtil(
             {
                 if(!(*visited)[dest])
                 {
-                    DFSwTimingsUtil(dest, pre, post, visited, time, reversed, nullptr, nullptr, nullptr);
+                    DFSwTimingsUtil(dest, pre, post, visited, time, reversed, nullptr, nullptr);
                 }
-                
             }
         }
-        (*post)[vertID] = *time;
+        (*post).push(vertID);
         (*time)++;
     }
     else
     {
         (*vertList).push_back(vertID);
         (*visited)[vertID] = true;
-        (*post).erase(vertID);
+        (*post).pop();
 
         if(outputG != nullptr)
         {
@@ -186,18 +176,8 @@ void Graph::DFSwTimingsUtil(
                 if(!(*visited)[dest])
                 {
                     
-                    DFSwTimingsUtil(dest, pre, post, visited, time, reversed, outputG, connList, vertList);
+                    DFSwTimingsUtil(dest, pre, post, visited, time, reversed, outputG, vertList);
                 }
-                else
-                {
-
-                    (*connList).push_back(Connection(dest, type));
-                }
-                
-            }
-            else
-            {
-                (*connList).push_back(Connection(dest, type));
             }
             
         }
@@ -432,15 +412,15 @@ bool Graph::CheckCyclic(list<int>* listOut = nullptr)
 
 bool Graph::CheckCommerciallyConnectedFast()
 {
-    Graph* simpleG = new Graph;
+    Graph simpleG;
 
     unordered_map<int ,list<Connection>> mapToUse;
 
-    if(CheckCyclicFast(simpleG))
+    if(CheckCyclic(nullptr))
     {
-        simpleG->reset();
-        GetSCCGraph(adjMap.begin()->first, simpleG, true);
-        mapToUse = (*simpleG).getAdjMap();    
+        // simpleG.printGraph();
+        GetSCCGraph(adjMap.begin()->first, &simpleG, true);
+        mapToUse = (simpleG).getAdjMap();    
     }
     else
     {
@@ -448,6 +428,7 @@ bool Graph::CheckCommerciallyConnectedFast()
     }
     
     std::list<int> checkList;
+    stack<int> checkStack;
     bool check = true;
     for (auto mapEntry : mapToUse)
     {
@@ -461,7 +442,11 @@ bool Graph::CheckCommerciallyConnectedFast()
             }
         }
         if(check)
+        {
             checkList.push_front(mapEntry.first);
+            checkStack.push(mapEntry.first);
+        }
+
     }
     if(checkList.size() == 1)
     {
@@ -469,42 +454,30 @@ bool Graph::CheckCommerciallyConnectedFast()
     }
     //SUBSTITUIDO POR DFS LMAOOOO
     unordered_set<int> set;
-    for (auto entry: checkList)
+    while (!checkStack.empty())
     {
+        int entry = checkStack.top();
+        checkStack.pop();
         for(auto conn: mapToUse[entry])
         {
-            set.insert(conn.getDest());
-        }
-        for(auto otherEntry: checkList)
-        {
-            if(otherEntry == entry)
-                continue;
-            if(set.find(otherEntry) == set.end())
+            bool isConnected = false;
+            for(auto otherEntry : checkList)
             {
-                simpleG->printGraph();
-                free(simpleG);
-                return false;
+                if(otherEntry == entry)
+                    continue;
+                if(conn.getDest() == otherEntry)
+                {
+                    isConnected = true;
+                    break;
+                }
+
             }
+            if(!isConnected)
+                return false;
         }
-        set.clear();
+        checkList.remove(entry);
     }
-    // std::list<int>::iterator at;
-    // for(auto entry : checkList)
-    // {
-    //     for(auto conn : mapToUse[entry])
-    //     {
-    //         at = std::find(checkList.begin() , checkList.end(), conn.getDest());
-    //         if(at == checkList.end())
-    //         {    
-    //             free(simpleG);
-    //             return false;
-    //         }
-    //     }
-    // }
-    simpleG->printGraph();
-    free(simpleG);
     return true;
-    
 }
 
 bool Graph::CheckCommerciallyConnected(bool connected)
@@ -542,14 +515,11 @@ bool Graph::CheckCommerciallyConnected(bool connected)
         }
     }
 
-
-
-
     free(visited);
     return true;
 }
 
-void Graph::aggregateV(list<int> vertList, list<Connection> connlist)
+void Graph::aggregateV(list<int> vertList)
 {
 
     int root = vertList.front();
@@ -558,7 +528,6 @@ void Graph::aggregateV(list<int> vertList, list<Connection> connlist)
         redirectMap[vert] = root;
 
     }
-    // connectVtoList(root, connlist);
 }
 
 void Graph::connectVtoList(int src, list<Connection> connList)
@@ -577,67 +546,4 @@ void Graph::connectVtoList(int src, list<Connection> connList)
     }
     this->adjMap[src] = connList;
 }
-// bool Graph::CheckAcyclic()
-// {   
-//     std::cout << "************ CHECK ACYCLIC ************" << std::endl;
 
-//     std::queue<int> queue;
-
-
-//     // Mark all the vertices as not visited 
-//     unordered_map<int, bool>* visited = new unordered_map<int, bool>;
-//     for (auto mapEntry : adjMap)
-//     {
-//         (*visited)[mapEntry.first] = false;
-//     }
-
-//     // Iterate through every node
-//     for (auto mapEntry : adjMap)
-//     {
-//         if ((*visited)[mapEntry.first] == false)
-//         {
-//             // Mark the node as visited and push it to the queue
-//             (*visited)[mapEntry.first] = true;
-//             queue.push(mapEntry.first);
-
-//             // While the FIFO queue is not empty
-//             while(queue.size() != 0)
-//             {
-//                 int frontOfQueue = queue.front();
-//                 queue.pop();
-
-//                 for (auto listEntry: adjMap[frontOfQueue])
-//                 {
-//                     int destination = listEntry.getDest();
-//                     int destinationType = listEntry.getType();
-
-//                     if((*visited)[destination] == true)
-//                     {
-//                         return false;
-//                     }
-//                     else
-//                     {
-//                         (*visited)[destination] = true;
-//                         queue.push(destination);
-//                     }    
-//                 }
-//             }
-//         }
-//     }
-
-//     free(visited);
-//     return true;
-// }
-
-// unordered_map<int ,list<Connection>> Graph::CloneAdjacencyList()
-// {
-//     unordered_map<int ,list<Connection>> replicaMap;
-
-//     for(auto mapEntry : adjMap)
-//     {
-//         for(auto listEntry : mapEntry.second)
-//         {
-//             replicaMap[mapEntry.first].push_back(Connection(listEntry.getDest(), listEntry.getType());
-//         }
-//     }
-// }
