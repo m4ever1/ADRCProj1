@@ -23,6 +23,7 @@ protected:
     unordered_map<int ,list<Connection>> adjMap; //unordered hasmap of lists of vertices
     unordered_map<int, int> redirectMap;
     int numVertices = 0;
+    int numConn = 0;
     bool DFSUtil(int , unordered_map<int, bool>*, pair<int, int>*, int);
     bool isConnectionCut(int, int, pair<int, int>*);
 public:
@@ -45,7 +46,7 @@ public:
     bool CheckCyclicFast(Graph*);
     bool GetSCCGraph(int, Graph*, bool);
     bool bridgeUtil(int, unordered_map<int, bool>*, unordered_map<int, int>*,  
-                                  unordered_map<int, int>*, unordered_map<int, int>*);
+                                  unordered_map<int, int>*, unordered_map<int, int>*, pair<int,int>*);
     void DFSwTimingsUtil(int, 
         unordered_map<int, int>*, 
         stack<int>*, 

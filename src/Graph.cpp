@@ -16,7 +16,7 @@ void Graph::addConnection(int src, int dest, int type)
 {
     if (this->adjMap[src].size() == 0)
         this->numVertices++; 
-
+    numConn++;
     this->adjMap[src].push_back(Connection(dest, type));
     
 }
@@ -69,7 +69,6 @@ bool Graph::GetSCCGraph(int startingV, Graph* outputG, bool fullGraph = false) /
     bool cyclic = false;
     while (!(post.empty()))
     {
-        // cout << "Oldest discovered: " << (post)->top() << endl;
 
         DFSwTimingsUtil(post.top(), nullptr, &post, &visited, &time, true, nullptr, &vertList);
 
@@ -81,10 +80,7 @@ bool Graph::GetSCCGraph(int startingV, Graph* outputG, bool fullGraph = false) /
         }
         
         (*outputG).aggregateV(vertList);
-
-        // (*outputG).printGraph();
         vertList.clear();
-        // cout << "*********" << endl;
     }
     for (auto mapEntry : adjMap)
     {
@@ -94,21 +90,19 @@ bool Graph::GetSCCGraph(int startingV, Graph* outputG, bool fullGraph = false) /
             int oldDest = entry.getDest();
             int newDest = (*outputG).redirectMap[oldDest];
             int type = entry.getType();
-            if(newDest != newNode && oldDest != newDest)
-{                (*outputG).addConnection(newNode, newDest, type);
-                (*outputG).addConnection(newDest, newNode, Connection::getReciprocalType(type));}
+            if(newDest != newNode)
+            {                
+                (*outputG).addConnection(newNode, newDest, type);
+                (*outputG).addConnection(newDest, newNode, Connection::getReciprocalType(type));
+            }
         }
     }
-           
-    cout << "Final Adjacency List" << endl;
-    // if(outputG != nullptr)
-    //     // (*outputG).printGraph();
 
     return cyclic;
 }
 // returns true if bridge was found
 bool Graph::bridgeUtil(int vertID, unordered_map<int, bool>* visited, unordered_map<int, int>* disc,  
-                                  unordered_map<int, int>* low, unordered_map<int, int>* parent) 
+                                  unordered_map<int, int>* low, unordered_map<int, int>* parent, pair<int,int>* output) 
 { 
     // A static variable is used for simplicity, we can  
     // avoid use of static variable by passing a pointer. 
@@ -130,7 +124,7 @@ bool Graph::bridgeUtil(int vertID, unordered_map<int, bool>* visited, unordered_
         if (!(*visited)[dest]) 
         { 
             (*parent)[dest] = vertID; 
-            if(bridgeUtil(dest, visited, disc, low, parent))
+            if(bridgeUtil(dest, visited, disc, low, parent, output))
             {
                 return true;
             }
@@ -143,8 +137,11 @@ bool Graph::bridgeUtil(int vertID, unordered_map<int, bool>* visited, unordered_
             // is a bridge 
             if ((*low)[dest] > (*disc)[vertID]) 
             {  
-                cout << vertID <<" " << dest << endl;
-                return true;
+                {   
+                    (*output).first = vertID;
+                    (*output).second = dest;
+                    return true;
+                }
             } 
         } 
   
@@ -152,7 +149,7 @@ bool Graph::bridgeUtil(int vertID, unordered_map<int, bool>* visited, unordered_
         else if (dest != (*parent)[vertID]) 
             (*low)[vertID]  = min((*low)[vertID], (*disc)[dest]); 
     }
-    return false; 
+    return false;
 } 
 
 bool Graph::CheckBiConnectedFast(pair<int, int>* bridge)
@@ -172,7 +169,7 @@ bool Graph::CheckBiConnectedFast(pair<int, int>* bridge)
     {
         if(!visited[mapEntry.first])
         {
-            if(bridgeUtil(mapEntry.first, &visited, &disc, &low, &parent))
+            if(bridgeUtil(mapEntry.first, &visited, &disc, &low, &parent, bridge))
             {
                 return false;
             }
@@ -280,8 +277,6 @@ int Graph::getNumVertices()
 {
     return this->numVertices;
 }
-    // DFS inspired by:
-    // https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/
 
 bool Graph::DFSUtil(int vertID, unordered_map<int, bool>* visited, pair<int, int>* cutC = nullptr, int previousType = 0)
 {
@@ -379,7 +374,6 @@ bool Graph::CheckBiConnected()
             // Check if connected
             if(!DFS(src, &cutC))
             {
-                std::cout << "Bridge: Source - " << cutC.first << " Destination - " << cutC.second << std::endl;
                 return false;
             }
         }
@@ -505,7 +499,6 @@ bool Graph::CheckCommerciallyConnectedFast()
         return true;
     }
 
-    unordered_set<int> set;
     while (!checkStack.empty())
     {
         int entry = checkStack.top();
