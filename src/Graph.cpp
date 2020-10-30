@@ -375,13 +375,13 @@ bool Graph::cyclicUtil(int vertID, unordered_map<int, bool>* visited, unordered_
 
 bool Graph::CheckCyclic(list<int>* listOut = nullptr)
 {
-    unordered_map<int, bool>* recStack = new unordered_map<int, bool>;
-    unordered_map<int, bool>* visited = new unordered_map<int, bool>;
+    unordered_map<int, bool> recStack;
+    unordered_map<int, bool> visited;
 
     for (auto mapEntry : adjMap)
     {
-        (*visited)[mapEntry.first] = false;
-        (*recStack)[mapEntry.first] = false;
+        (visited)[mapEntry.first] = false;
+        (recStack)[mapEntry.first] = false;
     }
         
     for (auto mapEntry : adjMap)
@@ -389,11 +389,11 @@ bool Graph::CheckCyclic(list<int>* listOut = nullptr)
         // Perform DFS and pass a finished nodes map in order to check for backlinks
         // If DFSUtil returns 'false' then it means it found a backlink and the graph
         // has a customer-provider cycle
-        if (cyclicUtil(mapEntry.first, visited, recStack))
+        if (cyclicUtil(mapEntry.first, &visited, &recStack))
         {
             if(listOut != nullptr)
             {
-                for(auto entry : *recStack)
+                for(auto entry : recStack)
                 {
                     if(entry.second)
                     {
@@ -403,10 +403,7 @@ bool Graph::CheckCyclic(list<int>* listOut = nullptr)
             }
             return true;
         }
-
     }
-    free(recStack);
-    free(visited);
     return false;
 }
 
