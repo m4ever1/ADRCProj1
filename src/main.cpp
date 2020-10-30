@@ -44,7 +44,6 @@ int main(int argc, char **argv)
     std::cout << std::endl;
 
     std::cout << "**************** GRAPH ****************" << std::endl;
-    // graphObj.printGraph();
     std::cout << "Number of vertices = " << graphObj.getNumVertices() << std::endl;
 
     Generator gen;
@@ -55,15 +54,12 @@ int main(int argc, char **argv)
     start = timeSinceEpochMillisec();
     bool connected = genGraph.CheckConnected();
     end = timeSinceEpochMillisec();
-
     std::cout << std::endl;
     std::cout << "TIME CHECKING CONNECTED" << std::endl;
     std::cout << ((end - start)/1000) << std::endl;
     std::cout << std::endl;
+
     // Check if graph is biconnected
-    /* 
-        TODO: OUTPUT BRIDGE
-    */
     start = timeSinceEpochMillisec();
     bool biConnected = genGraph.CheckBiConnected();
     end = timeSinceEpochMillisec();
@@ -71,18 +67,17 @@ int main(int argc, char **argv)
     std::cout << "TIME CHECKING BICONNECTED" << std::endl;
     std::cout << ((end - start)/1000) << std::endl;
     std::cout << std::endl;
+
     // Check if graph is commercially acyclic
-    /*
-        TODO: OUTPUT PROVIDER-CUSTOMER CYCLE
-    */
     start = timeSinceEpochMillisec();
-    list<int> cicleQuestioMark;
-    bool cyclic = genGraph.CheckCyclic(&cicleQuestioMark);
+    list<int> cycleQuestionMark;
+    bool cyclic = graphObj.CheckCyclic(&cycleQuestionMark);
     end = timeSinceEpochMillisec();
     std::cout << std::endl;
     std::cout << "TIME CHECKING CYCLIC (SLOW)" << std::endl;
     std::cout << ((end - start)/1000) << std::endl;
     std::cout << std::endl;
+
     // Check if graph is commercially connected
     start = timeSinceEpochMillisec();
     bool commerciallyConnected = genGraph.CheckCommerciallyConnected(connected);
@@ -91,76 +86,55 @@ int main(int argc, char **argv)
     std::cout << "TIME CHECKING CC (SLOW)" << std::endl;
     std::cout << ((end - start)/1000) << std::endl;
     std::cout << std::endl;
-    
-    std::cout << "*********** CHECK CONNECTED ***********" << std::endl;
-    if(connected)
-        std::cout << "CONNECTED" << std::endl;
-    else
-        std::cout << "NOT CONNECTED" << std::endl;
 
-    std::cout << "********** CHECK BICONNECTED **********" << std::endl;
-    if(biConnected)
-        std::cout << "BICONNECTED" << std::endl;
-    else
-        std::cout << "NOT BICONNECTED" << std::endl;
-
-    std::cout << "************ CHECK COMMERCIALLY ACYCLIC ************" << std::endl;
-    if(cyclic)
-        std::cout << "COMMERCIALLY CYCLIC" << std::endl;
-    else
-        std::cout << "ACYCLIC" << std::endl;
-    
-    std::cout << "**** CHECK COMMERCIALLY CONNECTED *****" << std::endl;
-    if(commerciallyConnected)
-        std::cout << "COMMERCIALLY CONNECTED" << std::endl;
-    else
-        std::cout << "NOT COMMERCIALLY CONNECTED" << std::endl;
-           
-    // genGraph.printGraph();
-
-    
-    Graph* cicle = new Graph;
+    // Check if graph is commercially connected (new algorithm)
     start = timeSinceEpochMillisec();
-    bool ciclic = genGraph.CheckCyclicFast(cicle);
-    end = timeSinceEpochMillisec();
-    std::cout << std::endl;
-    std::cout << "TIME CHECKING CYCLIC (FAST)" << std::endl;
-    std::cout << ((end - start)/1000) << std::endl;
-    std::cout << std::endl;
-
-
-    start = timeSinceEpochMillisec();
-    genGraph.CheckBiConnectedFast(nullptr);
-    end = timeSinceEpochMillisec();
-    std::cout << std::endl;
-    std::cout << "TIME CHECKING BI CONNECTED (FAST)" << std::endl;
-    std::cout << ((end - start)/1000) << std::endl;
-    std::cout << std::endl;
-
-    if(ciclic)
-    {
-        std::cout << "Cyclic" << std::endl;
-    }
-    else
-    {
-        std::cout << "Not Cyclic" << std::endl;
-    }
-    start = timeSinceEpochMillisec();
-    bool CC = genGraph.CheckCommerciallyConnectedFast();
+    bool commerciallyConnectedFast = graphObj.CheckCommerciallyConnectedFast();
     end = timeSinceEpochMillisec();
     std::cout << std::endl;
     std::cout << "TIME CHECKING CC (FAST)" << std::endl;
     std::cout << ((end - start)/1000) << std::endl;
     std::cout << std::endl;
-    if(CC)
+    
+    std::cout << "************** CHECK CONNECTED **************" << std::endl;
+    if(connected)
+        std::cout << "CONNECTED" << std::endl;
+    else
+        std::cout << "NOT CONNECTED" << std::endl;
+    std::cout << "************* CHECK BICONNECTED *************" << std::endl;
+    if(biConnected)
+        std::cout << "BICONNECTED" << std::endl;
+    else
+        std::cout << "NOT BICONNECTED" << std::endl;
+
+    std::cout << "******** CHECK COMMERCIALLY ACYCLIC *********" << std::endl;
+    if(cyclic) 
     {
-        std::cout << "CC" << std::endl;
+        std::cout << "CYCLIC" << std::endl;
+        std::cout << "Cycle: " << std::endl;
+
+        for (auto i : cycleQuestionMark)
+        {
+            std::cout << i << std::endl;
+        }
+        
     }
     else
-    {
-        std::cout << "Not CC" << std::endl;
-    }
+        std::cout << "COMMERCIALLY ACYCLIC" << std::endl;
     
-    free(cicle);
+    std::cout << "******* CHECK COMMERCIALLY CONNECTED ********" << std::endl;
+    if(commerciallyConnected)
+        std::cout << "COMMERCIALLY CONNECTED" << std::endl;
+    else
+        std::cout << "NOT COMMERCIALLY CONNECTED" << std::endl;
+
+
+    std::cout << "***** CHECK COMMERCIALLY CONNECTED FAST *****" << std::endl;
+    if(commerciallyConnectedFast)
+        std::cout << "COMMERCIALLY CONNECTED" << std::endl;
+    else
+        std::cout << "NOT COMMERCIALLY CONNECTED" << std::endl;
+
+    
     return 0;
 }

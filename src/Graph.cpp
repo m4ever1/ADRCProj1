@@ -239,12 +239,8 @@ void Graph::DFSwTimingsUtil(
             int type = listEntry.getType();
             if(type == desiredType)
             {
-
-                // (*outputG).addConnection(vertID, dest, type);
-                // (*outputG).addConnection(dest, vertID, Connection::getReciprocalType(type));
                 if(!(*visited)[dest])
-                {
-                    
+                {   
                     DFSwTimingsUtil(dest, pre, post, visited, time, reversed, outputG, vertList);
                 }
             }
@@ -455,9 +451,6 @@ bool Graph::CheckCyclic(list<int>* listOut)
         
     for (auto mapEntry : adjMap)
     {
-        // Perform DFS and pass a finished nodes map in order to check for backlinks
-        // If DFSUtil returns 'false' then it means it found a backlink and the graph
-        // has a customer-provider cycle
         if (cyclicUtil(mapEntry.first, &visited, &recStack))
         {
             if(listOut != nullptr)
@@ -465,9 +458,7 @@ bool Graph::CheckCyclic(list<int>* listOut)
                 for(auto entry : recStack)
                 {
                     if(entry.second)
-                    {
                         (*listOut).push_back(entry.first);
-                    }
                 } 
             }
             return true;
