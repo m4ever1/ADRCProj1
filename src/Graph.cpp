@@ -66,19 +66,20 @@ bool Graph::GetSCCGraph(int startingV, Graph* outputG, bool fullGraph = false) /
     }
 
     list<int> vertList;
-
+    bool cyclic = false;
     while (!(post.empty()))
     {
         // cout << "Oldest discovered: " << (post)->top() << endl;
 
         DFSwTimingsUtil(post.top(), nullptr, &post, &visited, &time, true, nullptr, &vertList);
-        if(!fullGraph)
+
+        if(vertList.size() > 1)
         {
-            if(vertList.size() > 1)
-            {
+            cyclic = true;
+            if(!fullGraph)
                 return true;
-            }
         }
+        
         (*outputG).aggregateV(vertList);
 
         // (*outputG).printGraph();
@@ -103,14 +104,7 @@ bool Graph::GetSCCGraph(int startingV, Graph* outputG, bool fullGraph = false) /
     // if(outputG != nullptr)
     //     // (*outputG).printGraph();
 
-    if ((*outputG).getNumVertices() > 1)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return cyclic;
 }
 // returns true if bridge was found
 bool Graph::bridgeUtil(int vertID, unordered_map<int, bool>* visited, unordered_map<int, int>* disc,  
@@ -142,7 +136,7 @@ bool Graph::bridgeUtil(int vertID, unordered_map<int, bool>* visited, unordered_
             }
             // Check if the subtree rooted with v has a  
             // connection to one of the ancestors of u 
-            (*low)[vertID]  = min((*low)[dest], (*low)[dest]); 
+            (*low)[vertID]  = min((*low)[vertID], (*low)[dest]); 
   
             // If the lowest vertex reachable from subtree  
             // under v is  below u in DFS tree, then u-v  
@@ -180,11 +174,11 @@ bool Graph::CheckBiConnectedFast(pair<int, int>* bridge)
         {
             if(bridgeUtil(mapEntry.first, &visited, &disc, &low, &parent))
             {
-                return true;
+                return false;
             }
         }
     }
-    return false;
+    return true;
 }
 
 void Graph::DFSwTimingsUtil(
@@ -265,6 +259,7 @@ bool Graph::doesConnExist(int src, int dest)
 void Graph::reset() 
 {
     numVertices = 0;
+    redirectMap.clear();
     // unordered_map<int ,list<Connection>>::iterator itr;
     adjMap.clear();
 }
@@ -473,17 +468,17 @@ bool Graph::CheckCommerciallyConnectedFast()
 
     unordered_map<int ,list<Connection>> mapToUse;
 
-    if(CheckCyclic(nullptr))
+    if(GetSCCGraph(adjMap.begin()->first, &simpleG, true))
     {
         // simpleG.printGraph();
-        GetSCCGraph(adjMap.begin()->first, &simpleG, true);
+        
         mapToUse = (simpleG).getAdjMap();    
     }
     else
     {
         mapToUse = adjMap;
     }
-    
+    //OLHAR PARA OUTPUTG
     std::list<int> checkList;
     stack<int> checkStack;
     bool check = true;
@@ -509,25 +504,25 @@ bool Graph::CheckCommerciallyConnectedFast()
     {
         return true;
     }
-    //SUBSTITUIDO POR DFS LMAOOOO
+
     unordered_set<int> set;
     while (!checkStack.empty())
     {
         int entry = checkStack.top();
         checkStack.pop();
-        for(auto conn: mapToUse[entry])
+        for(auto otherEntry : checkList)
         {
+            if(otherEntry == entry)
+                continue;
             bool isConnected = false;
-            for(auto otherEntry : checkList)
+            for(auto conn: mapToUse[entry])
             {
-                if(otherEntry == entry)
-                    continue;
+
                 if(conn.getDest() == otherEntry)
                 {
                     isConnected = true;
                     break;
                 }
-
             }
             if(!isConnected)
                 return false;

@@ -8,7 +8,7 @@ LIB		:= lib
 
 LIBRARIES	:=
 EXECUTABLE	:= main
-ARGS		:= ./input/LargeNetwork.txt
+ARGS		:= ./input/SSC.txt
 
 
 all: $(BIN)/$(EXECUTABLE) $(ARGS)

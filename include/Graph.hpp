@@ -8,6 +8,8 @@
 #include "utils.hpp"
 #include <unordered_set>
 #include <stack>
+#include <stdlib.h>  
+#include <ctime>
 #define NIL -1 
 
 using namespace std;

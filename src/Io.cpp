@@ -33,6 +33,21 @@ string fileIO::readLine()// returns a string containing the line, if EOF returns
     }
 }
 
+void fileIO::outputToFile(Graph G)
+{
+    ofstream outfile;
+    
+    outfile.open("./input/generated.txt");
+    for(auto mapEntry : G.getAdjMap())
+    {
+        for(auto conn : mapEntry.second)
+        {
+            outfile << mapEntry.first << " " << conn.getDest() << " " << conn.getType() << std::endl;
+        }
+
+    }
+    outfile.close();
+}
 
 fileIO::~fileIO()
 {
