@@ -10,7 +10,7 @@ Graph Generator::generateGraph(int nrNodes)
     srand (time(NULL));
     for(int i = 1; i < nrNodes + 1; i++)
     {
-        int numConn = rand() % nrNodes;
+        int numConn = rand() % 21;
         // std::cout << "\n" << numConn <<"\n" << std::endl;
         for(int j = 0; j < numConn; j++)
         {

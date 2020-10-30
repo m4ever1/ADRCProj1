@@ -1,7 +1,6 @@
 #include "Io.hpp"
 #include "Graph.hpp"
 #include "Generator.hpp"
-#include "SimpGraph.hpp"
 #include <list>
 #include <chrono>
 
@@ -48,12 +47,13 @@ int main(int argc, char **argv)
     // graphObj.printGraph();
     std::cout << "Number of vertices = " << graphObj.getNumVertices() << std::endl;
 
-    // Generator gen;
-    // genGraph = gen.generateGraph(5);
-
+    Generator gen;
+    // genGraph = gen.generateGraph(1000);
+    genGraph = graphObj;
+    std::cout << "BRUH" << std::endl;
     // Check if graph is connect
     start = timeSinceEpochMillisec();
-    bool connected = graphObj.CheckConnected();
+    bool connected = genGraph.CheckConnected();
     end = timeSinceEpochMillisec();
 
     std::cout << std::endl;
@@ -65,7 +65,7 @@ int main(int argc, char **argv)
         TODO: OUTPUT BRIDGE
     */
     start = timeSinceEpochMillisec();
-    bool biConnected = graphObj.CheckBiConnected();
+    bool biConnected = genGraph.CheckBiConnected();
     end = timeSinceEpochMillisec();
     std::cout << std::endl;
     std::cout << "TIME CHECKING BICONNECTED" << std::endl;
@@ -77,7 +77,7 @@ int main(int argc, char **argv)
     */
     start = timeSinceEpochMillisec();
     list<int> cicleQuestioMark;
-    bool cyclic = graphObj.CheckCyclic(&cicleQuestioMark);
+    bool cyclic = genGraph.CheckCyclic(&cicleQuestioMark);
     end = timeSinceEpochMillisec();
     std::cout << std::endl;
     std::cout << "TIME CHECKING CYCLIC (SLOW)" << std::endl;
@@ -85,7 +85,7 @@ int main(int argc, char **argv)
     std::cout << std::endl;
     // Check if graph is commercially connected
     start = timeSinceEpochMillisec();
-    bool commerciallyConnected = graphObj.CheckCommerciallyConnected(connected);
+    bool commerciallyConnected = genGraph.CheckCommerciallyConnected(connected);
     end = timeSinceEpochMillisec();
     std::cout << std::endl;
     std::cout << "TIME CHECKING CC (SLOW)" << std::endl;
@@ -116,19 +116,27 @@ int main(int argc, char **argv)
     else
         std::cout << "NOT COMMERCIALLY CONNECTED" << std::endl;
            
-    // graphObj.printGraph();
+    // genGraph.printGraph();
 
     
     Graph* cicle = new Graph;
     start = timeSinceEpochMillisec();
-    bool ciclic = graphObj.CheckCyclicFast(cicle);
+    bool ciclic = genGraph.CheckCyclicFast(cicle);
     end = timeSinceEpochMillisec();
     std::cout << std::endl;
     std::cout << "TIME CHECKING CYCLIC (FAST)" << std::endl;
     std::cout << ((end - start)/1000) << std::endl;
     std::cout << std::endl;
 
-    // cicle->printGraph();
+
+    start = timeSinceEpochMillisec();
+    genGraph.CheckBiConnectedFast(nullptr);
+    end = timeSinceEpochMillisec();
+    std::cout << std::endl;
+    std::cout << "TIME CHECKING BI CONNECTED (FAST)" << std::endl;
+    std::cout << ((end - start)/1000) << std::endl;
+    std::cout << std::endl;
+
     if(ciclic)
     {
         std::cout << "Cyclic" << std::endl;
@@ -138,7 +146,7 @@ int main(int argc, char **argv)
         std::cout << "Not Cyclic" << std::endl;
     }
     start = timeSinceEpochMillisec();
-    bool CC = graphObj.CheckCommerciallyConnectedFast();
+    bool CC = genGraph.CheckCommerciallyConnectedFast();
     end = timeSinceEpochMillisec();
     std::cout << std::endl;
     std::cout << "TIME CHECKING CC (FAST)" << std::endl;

@@ -8,7 +8,7 @@
 #include "utils.hpp"
 #include <unordered_set>
 #include <stack>
-
+#define NIL -1 
 
 using namespace std;
 
@@ -21,7 +21,6 @@ protected:
     unordered_map<int ,list<Connection>> adjMap; //unordered hasmap of lists of vertices
     unordered_map<int, int> redirectMap;
     int numVertices = 0;
-    int maxValue = -1;
     bool DFSUtil(int , unordered_map<int, bool>*, pair<int, int>*, int);
     bool isConnectionCut(int, int, pair<int, int>*);
 public:
@@ -33,6 +32,7 @@ public:
     bool DFS(int, pair<int, int>*);
     bool checkConnected();
     bool CheckBiConnected();
+    bool CheckBiConnectedFast(pair<int, int>*);
     bool CheckConnected();
     bool cyclicUtil(int , unordered_map<int, bool>*, unordered_map<int, bool>*);
     bool CheckCyclic(list<int>*);
@@ -42,6 +42,8 @@ public:
     void removeConnection(int, int, int);
     bool CheckCyclicFast(Graph*);
     bool GetSCCGraph(int, Graph*, bool);
+    bool bridgeUtil(int, unordered_map<int, bool>*, unordered_map<int, int>*,  
+                                  unordered_map<int, int>*, unordered_map<int, int>*);
     void DFSwTimingsUtil(int, 
         unordered_map<int, int>*, 
         stack<int>*, 

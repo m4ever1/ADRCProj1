@@ -3,6 +3,7 @@
 #include <queue>
 #include <list>
 
+
 using namespace std;
 
 void Graph::addVertice(int src)
@@ -15,11 +16,6 @@ void Graph::addConnection(int src, int dest, int type)
 {
     if (this->adjMap[src].size() == 0)
         this->numVertices++; 
-
-    if (src > maxValue)
-        this->maxValue = src;
-    else if (dest > maxValue)
-        this->maxValue = dest;
 
     this->adjMap[src].push_back(Connection(dest, type));
     
@@ -116,7 +112,80 @@ bool Graph::GetSCCGraph(int startingV, Graph* outputG, bool fullGraph = false) /
         return false;
     }
 }
+// returns true if bridge was found
+bool Graph::bridgeUtil(int vertID, unordered_map<int, bool>* visited, unordered_map<int, int>* disc,  
+                                  unordered_map<int, int>* low, unordered_map<int, int>* parent) 
+{ 
+    // A static variable is used for simplicity, we can  
+    // avoid use of static variable by passing a pointer. 
+    static int time = 0; 
+  
+    // Mark the current node as visited 
+    (*visited)[vertID] = true; 
+  
+    // Initialize discovery time and low value 
+    (*disc)[vertID] = (*low)[vertID] = ++time; 
+  
+    // Go through all vertices aadjacent to this 
+ 
+    for (auto listEntry : adjMap[vertID]) 
+    { 
+        int dest = listEntry.getDest();  // v is current adjacent of u 
+  
+        // If v is not visited yet, then recur for it 
+        if (!(*visited)[dest]) 
+        { 
+            (*parent)[dest] = vertID; 
+            if(bridgeUtil(dest, visited, disc, low, parent))
+            {
+                return true;
+            }
+            // Check if the subtree rooted with v has a  
+            // connection to one of the ancestors of u 
+            (*low)[vertID]  = min((*low)[dest], (*low)[dest]); 
+  
+            // If the lowest vertex reachable from subtree  
+            // under v is  below u in DFS tree, then u-v  
+            // is a bridge 
+            if ((*low)[dest] > (*disc)[vertID]) 
+            {  
+                cout << vertID <<" " << dest << endl;
+                return true;
+            } 
+        } 
+  
+        // Update low value of u for parent function calls. 
+        else if (dest != (*parent)[vertID]) 
+            (*low)[vertID]  = min((*low)[vertID], (*disc)[dest]); 
+    }
+    return false; 
+} 
 
+bool Graph::CheckBiConnectedFast(pair<int, int>* bridge)
+{
+    unordered_map<int, int> disc;
+    unordered_map<int, int> low;
+    unordered_map<int, int> parent;
+    unordered_map<int, bool> visited;
+
+    for(auto mapEntry : adjMap)
+    {
+        (visited)[mapEntry.first] = false;
+        parent[mapEntry.first] = NIL;
+    }
+
+    for(auto mapEntry : adjMap)
+    {
+        if(!visited[mapEntry.first])
+        {
+            if(bridgeUtil(mapEntry.first, &visited, &disc, &low, &parent))
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 void Graph::DFSwTimingsUtil(
     int vertID, 
@@ -373,7 +442,7 @@ bool Graph::cyclicUtil(int vertID, unordered_map<int, bool>* visited, unordered_
     return false;
 }
 
-bool Graph::CheckCyclic(list<int>* listOut = nullptr)
+bool Graph::CheckCyclic(list<int>* listOut)
 {
     unordered_map<int, bool> recStack;
     unordered_map<int, bool> visited;
@@ -533,8 +602,6 @@ void Graph::connectVtoList(int src, list<Connection> connList)
     if (adjMap[src].size() == 0)
         numVertices++; 
 
-    if (src > maxValue)
-        this->maxValue = src;
     for(auto entry: connList)
     {
         int oldDest = entry.getDest();
